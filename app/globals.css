@@ -1,26 +1,602 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens and component styles modelled on Vaadin's Lumo theme (light),
+ * values from vaadin/web-components v25.3.7 packages/vaadin-lumo-styles (Apache-2.0).
+ * https://vaadin.com/docs/latest/styling/themes/lumo
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color */
+  --lumo-base-color: #fff;
+  --lumo-shade: hsl(214, 35%, 15%);
+  --lumo-contrast-5pct: hsla(214, 61%, 25%, 0.05);
+  --lumo-contrast-10pct: hsla(214, 57%, 24%, 0.1);
+  --lumo-contrast-20pct: hsla(214, 53%, 23%, 0.16);
+  --lumo-contrast-30pct: hsla(214, 50%, 22%, 0.26);
+  --lumo-contrast-40pct: hsla(214, 47%, 21%, 0.38);
+  --lumo-contrast-50pct: hsla(214, 45%, 20%, 0.52);
+  --lumo-contrast-60pct: hsla(214, 43%, 19%, 0.6);
+  --lumo-contrast-70pct: hsla(214, 42%, 18%, 0.69);
+  --lumo-contrast-80pct: hsla(214, 41%, 17%, 0.83);
+  --lumo-contrast-90pct: hsla(214, 40%, 16%, 0.94);
+  --lumo-contrast: var(--lumo-shade);
+
+  --lumo-primary-color: hsl(214, 100%, 48%);
+  --lumo-primary-color-50pct: hsla(214, 100%, 49%, 0.76);
+  --lumo-primary-color-10pct: hsla(214, 100%, 60%, 0.13);
+  --lumo-primary-text-color: hsl(214, 100%, 43%);
+  --lumo-primary-contrast-color: #fff;
+
+  --lumo-error-color: hsl(3, 85%, 48%);
+  --lumo-error-color-50pct: hsla(3, 85%, 49%, 0.5);
+  --lumo-error-color-10pct: hsla(3, 85%, 49%, 0.1);
+  --lumo-error-text-color: hsl(3, 89%, 42%);
+
+  --lumo-success-color: hsl(145, 72%, 30%);
+  --lumo-success-color-50pct: hsla(145, 72%, 31%, 0.5);
+  --lumo-success-color-10pct: hsla(145, 72%, 31%, 0.1);
+  --lumo-success-text-color: hsl(145, 85%, 25%);
+
+  --lumo-warning-color: hsl(48, 100%, 50%);
+  --lumo-warning-color-10pct: hsla(48, 100%, 50%, 0.25);
+  --lumo-warning-text-color: hsl(32, 100%, 30%);
+
+  --lumo-header-text-color: var(--lumo-contrast);
+  --lumo-body-text-color: var(--lumo-contrast-90pct);
+  --lumo-secondary-text-color: var(--lumo-contrast-70pct);
+  --lumo-tertiary-text-color: var(--lumo-contrast-50pct);
+  --lumo-disabled-text-color: var(--lumo-contrast-30pct);
+
+  /* Size and space */
+  --lumo-size-xs: 1.625rem;
+  --lumo-size-s: 1.875rem;
+  --lumo-size-m: 2.25rem;
+  --lumo-size-l: 2.75rem;
+  --lumo-size-xl: 3.5rem;
+  --lumo-space-xs: 0.25rem;
+  --lumo-space-s: 0.5rem;
+  --lumo-space-m: 1rem;
+  --lumo-space-l: 1.5rem;
+  --lumo-space-xl: 2.5rem;
+
+  /* Shape and elevation */
+  --lumo-border-radius-s: 0.25em;
+  --lumo-border-radius-m: 0.25em;
+  --lumo-border-radius-l: 0.5em;
+  --lumo-shade-5pct: hsla(214, 61%, 25%, 0.05);
+  --lumo-shade-20pct: hsla(214, 53%, 23%, 0.16);
+  --lumo-shade-30pct: hsla(214, 50%, 22%, 0.26);
+  --lumo-shade-40pct: hsla(214, 47%, 21%, 0.38);
+  --lumo-shade-50pct: hsla(214, 45%, 20%, 0.52);
+  --lumo-box-shadow-xs: 0 1px 4px -1px var(--lumo-shade-50pct);
+  --lumo-box-shadow-s: 0 2px 4px -1px var(--lumo-shade-20pct), 0 3px 12px -1px var(--lumo-shade-30pct);
+  --lumo-box-shadow-m: 0 2px 6px -1px var(--lumo-shade-20pct), 0 8px 24px -4px var(--lumo-shade-40pct);
+  --lumo-box-shadow-l: 0 3px 18px -2px var(--lumo-shade-20pct), 0 12px 48px -6px var(--lumo-shade-40pct);
+  --lumo-box-shadow-xl: 0 4px 24px -3px var(--lumo-shade-20pct), 0 18px 64px -8px var(--lumo-shade-40pct);
+  --lumo-focus-ring: 0 0 0 2px var(--lumo-primary-color-50pct);
+
+  --background: var(--lumo-base-color);
+  --foreground: var(--lumo-body-text-color);
 }
 
+/* Tailwind utilities for the tokens, e.g. bg-contrast-5, text-secondary, rounded-lumo-m, shadow-lumo-m */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-base: var(--lumo-base-color);
+  --color-contrast: var(--lumo-contrast);
+  --color-contrast-5: var(--lumo-contrast-5pct);
+  --color-contrast-10: var(--lumo-contrast-10pct);
+  --color-contrast-20: var(--lumo-contrast-20pct);
+  --color-contrast-30: var(--lumo-contrast-30pct);
+  --color-contrast-50: var(--lumo-contrast-50pct);
+  --color-contrast-60: var(--lumo-contrast-60pct);
+  --color-contrast-70: var(--lumo-contrast-70pct);
+
+  --color-primary: var(--lumo-primary-color);
+  --color-primary-50: var(--lumo-primary-color-50pct);
+  --color-primary-10: var(--lumo-primary-color-10pct);
+  --color-primary-text: var(--lumo-primary-text-color);
+  --color-error: var(--lumo-error-color);
+  --color-error-50: var(--lumo-error-color-50pct);
+  --color-error-10: var(--lumo-error-color-10pct);
+  --color-error-text: var(--lumo-error-text-color);
+  --color-success: var(--lumo-success-color);
+  --color-success-10: var(--lumo-success-color-10pct);
+  --color-success-text: var(--lumo-success-text-color);
+  --color-warning: var(--lumo-warning-color);
+  --color-warning-10: var(--lumo-warning-color-10pct);
+  --color-warning-text: var(--lumo-warning-text-color);
+
+  --color-header: var(--lumo-header-text-color);
+  --color-body: var(--lumo-body-text-color);
+  --color-secondary: var(--lumo-secondary-text-color);
+  --color-tertiary: var(--lumo-tertiary-text-color);
+  --color-disabled: var(--lumo-disabled-text-color);
+
+  --radius-lumo-s: var(--lumo-border-radius-s);
+  --radius-lumo-m: var(--lumo-border-radius-m);
+  --radius-lumo-l: var(--lumo-border-radius-l);
+  --shadow-lumo-xs: var(--lumo-box-shadow-xs);
+  --shadow-lumo-s: var(--lumo-box-shadow-s);
+  --shadow-lumo-m: var(--lumo-box-shadow-m);
+  --shadow-lumo-l: var(--lumo-box-shadow-l);
+  --shadow-lumo-xl: var(--lumo-box-shadow-xl);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Inter: single-storey a is noisier; keep defaults but use the disambiguated l/1 forms (cv05, cv08) */
+  font-feature-settings: "cv05", "cv08";
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.011em;
+}
+
+@layer components {
+  /* ---------------------------------------------------------------- Button
+     Lumo default ("secondary"): contrast-5% fill, primary-colored text. */
+  .btn,
+  .btn-secondary,
+  .btn-primary,
+  .btn-tertiary,
+  .btn-ghost,
+  .btn-error,
+  .btn-danger,
+  .btn-error-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lumo-space-s);
+    height: var(--lumo-size-m);
+    min-width: calc(var(--lumo-size-m) * 2);
+    padding: 0 calc(var(--lumo-size-m) / 3 + var(--lumo-border-radius-m) / 2);
+    border: none;
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-contrast-5pct);
+    color: var(--lumo-primary-text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+    isolation: isolate;
+  }
+  /* Hover/active overlay, as Lumo does with ::before */
+  .btn::before,
+  .btn-secondary::before,
+  .btn-primary::before,
+  .btn-tertiary::before,
+  .btn-ghost::before,
+  .btn-error::before,
+  .btn-danger::before,
+  .btn-error-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  :is(.btn, .btn-secondary, .btn-tertiary, .btn-ghost, .btn-error, .btn-danger):hover:not(:disabled)::before {
+    opacity: 0.02;
+  }
+  :is(.btn, .btn-secondary, .btn-tertiary, .btn-ghost, .btn-error, .btn-danger):active:not(:disabled)::before {
+    opacity: 0.05;
+  }
+  :is(.btn, .btn-secondary, .btn-primary, .btn-tertiary, .btn-ghost, .btn-error, .btn-danger, .btn-error-primary):focus-visible {
+    outline: none;
+    box-shadow: var(--lumo-focus-ring);
+  }
+  :is(.btn, .btn-secondary, .btn-tertiary, .btn-ghost, .btn-error, .btn-danger):disabled {
+    color: var(--lumo-disabled-text-color);
+    cursor: default;
+  }
+
+  .btn-primary,
+  .btn-error-primary {
+    min-width: calc(var(--lumo-size-m) * 2.5);
+    background: var(--lumo-primary-color);
+    color: var(--lumo-primary-contrast-color);
+    font-weight: 600;
+  }
+  .btn-error-primary {
+    background: var(--lumo-error-color);
+  }
+  :is(.btn-primary, .btn-error-primary)::before {
+    background: #000;
+  }
+  :is(.btn-primary, .btn-error-primary):hover:not(:disabled)::before {
+    opacity: 0.05;
+  }
+  :is(.btn-primary, .btn-error-primary):active:not(:disabled)::before {
+    opacity: 0.1;
+  }
+  :is(.btn-primary, .btn-error-primary):disabled {
+    background: var(--lumo-contrast-30pct);
+    color: var(--lumo-base-color);
+    cursor: default;
+  }
+
+  /* Tertiary: no fill */
+  .btn-tertiary,
+  .btn-ghost {
+    min-width: 0;
+    padding: 0 calc(var(--lumo-size-m) / 6);
+    background: transparent;
+  }
+  .btn-ghost {
+    padding: 0 calc(var(--lumo-size-m) / 3);
+  }
+
+  /* Error: dangerous or irreversible actions */
+  .btn-error,
+  .btn-danger {
+    color: var(--lumo-error-text-color);
+  }
+
+  .btn-sm {
+    height: var(--lumo-size-s);
+    min-width: calc(var(--lumo-size-s) * 2);
+    padding: 0 calc(var(--lumo-size-s) / 3 + var(--lumo-border-radius-m) / 2);
+    font-size: 0.875rem;
+  }
+  .btn-tertiary.btn-sm {
+    min-width: 0;
+    padding: 0 calc(var(--lumo-size-s) / 6);
+  }
+  .btn-icon {
+    min-width: var(--lumo-size-m);
+    width: var(--lumo-size-m);
+    padding: 0;
+  }
+  .btn-icon.btn-sm {
+    min-width: var(--lumo-size-s);
+    width: var(--lumo-size-s);
+  }
+
+  /* ------------------------------------------------------------ Text field
+     Filled (contrast-10%), no border, medium weight value text. */
+  .text-field {
+    height: var(--lumo-size-m);
+    min-width: 0;
+    padding: 0 calc(0.375em + var(--lumo-border-radius-m) / 4 - 1px);
+    border: none;
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-contrast-10pct);
+    color: var(--lumo-body-text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.15s, box-shadow 0.15s;
+  }
+  .text-field:hover:not(:focus):not(:disabled) {
+    background: linear-gradient(hsla(214, 45%, 20%, 0.05), hsla(214, 45%, 20%, 0.05)), var(--lumo-contrast-10pct);
+  }
+  .text-field:focus,
+  .text-field:focus-visible {
+    outline: none;
+    box-shadow: var(--lumo-focus-ring);
+  }
+  .text-field::placeholder {
+    color: var(--lumo-secondary-text-color);
+    font-weight: 400;
+  }
+  .text-field:disabled {
+    background: var(--lumo-contrast-5pct);
+    color: var(--lumo-disabled-text-color);
+  }
+  .text-field[aria-invalid="true"] {
+    background: var(--lumo-error-color-10pct);
+  }
+  .text-field-sm {
+    height: var(--lumo-size-s);
+    font-size: 0.875rem;
+  }
+  select.text-field {
+    appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8l4 4 4-4' stroke='hsla(214,43%25,19%25,0.6)' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.1rem;
+    cursor: pointer;
+  }
+  .field-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: var(--lumo-secondary-text-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .field-label:focus-within {
+    color: var(--lumo-primary-text-color);
+  }
+  .field-helper {
+    color: var(--lumo-secondary-text-color);
+    font-size: 0.8125rem;
+  }
+
+  /* -------------------------------------------------------------- Checkbox */
+  .checkbox {
+    appearance: none;
+    flex: none;
+    position: relative;
+    width: calc(var(--lumo-size-m) / 2);
+    height: calc(var(--lumo-size-m) / 2);
+    margin: 0;
+    border-radius: var(--lumo-border-radius-s);
+    background: var(--lumo-contrast-20pct);
+    cursor: pointer;
+    transition: background-color 0.15s, box-shadow 0.15s;
+  }
+  .checkbox:hover:not(:checked):not(:disabled) {
+    background: var(--lumo-contrast-30pct);
+  }
+  .checkbox:checked,
+  .checkbox:indeterminate {
+    background: var(--lumo-primary-color);
+  }
+  .checkbox:checked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: center / 75% no-repeat
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .checkbox:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 1px var(--lumo-base-color), 0 0 0 3px var(--lumo-primary-color-50pct);
+  }
+  .checkbox:disabled {
+    background: var(--lumo-contrast-10pct);
+    cursor: default;
+  }
+
+  /* ------------------------------------------------------------------ Grid
+     1px contrast-20% outline, contrast-10% row separators, small medium-weight
+     header cells, primary-10% selected rows. */
+  /* Visible overflow so row menus aren't clipped; scroll horizontally only on small screens. */
+  .data-grid {
+    overflow: visible;
+    border: 1px solid var(--lumo-contrast-20pct);
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-base-color);
+    color: var(--lumo-body-text-color);
+    font-size: 0.9375rem;
+    line-height: 1.375;
+    /* Dates, sizes and versions line up in columns */
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 768px) {
+    .data-grid {
+      overflow-x: auto;
+    }
+  }
+  .data-grid > table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  .data-grid th {
+    height: var(--lumo-size-l);
+    background: var(--lumo-base-color);
+    padding: var(--lumo-space-xs) var(--lumo-space-m);
+    border-bottom: 1px solid var(--lumo-contrast-10pct);
+    color: var(--lumo-body-text-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .data-grid td {
+    height: var(--lumo-size-l);
+    padding: var(--lumo-space-xs) var(--lumo-space-m);
+    border-top: 1px solid var(--lumo-contrast-10pct);
+    vertical-align: middle;
+  }
+  .data-grid tbody tr:first-child td {
+    border-top: 0;
+  }
+  .data-grid tr[aria-selected="true"] td {
+    background-image: linear-gradient(var(--lumo-primary-color-10pct), var(--lumo-primary-color-10pct));
+  }
+  .data-grid tr.row-link:hover td {
+    background: var(--lumo-contrast-5pct);
+  }
+  .data-grid-compact th,
+  .data-grid-compact td {
+    height: var(--lumo-size-s);
+    padding: var(--lumo-space-xs) var(--lumo-space-s);
+  }
+
+  /* ----------------------------------------------------------------- Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    padding: 0.4em calc(0.5em + var(--lumo-border-radius-s) / 4);
+    border-radius: var(--lumo-border-radius-s);
+    background: var(--lumo-primary-color-10pct);
+    color: var(--lumo-primary-text-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .badge-sm {
+    font-size: 0.75rem;
+  }
+  .badge-success {
+    background: var(--lumo-success-color-10pct);
+    color: var(--lumo-success-text-color);
+  }
+  .badge-error {
+    background: var(--lumo-error-color-10pct);
+    color: var(--lumo-error-text-color);
+  }
+  .badge-warning {
+    background: var(--lumo-warning-color-10pct);
+    color: var(--lumo-warning-text-color);
+  }
+  .badge-contrast {
+    background: var(--lumo-contrast-5pct);
+    color: var(--lumo-contrast-80pct);
+  }
+  .badge-pill {
+    border-radius: 1em;
+  }
+
+  /* ------------------------------------------------------------------ Tabs */
+  .tabs {
+    display: flex;
+    min-height: var(--lumo-size-l);
+    box-shadow: inset 0 -1px 0 0 var(--lumo-contrast-10pct);
+  }
+  .tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: var(--lumo-size-m);
+    padding: var(--lumo-space-s) var(--lumo-space-m);
+    color: var(--lumo-secondary-text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.25;
+    transition: color 0.15s;
+  }
+  .tab:hover {
+    color: var(--lumo-body-text-color);
+  }
+  .tab[aria-current="page"],
+  .tab[aria-selected="true"] {
+    color: var(--lumo-primary-text-color);
+  }
+  .tab[aria-current="page"]::before,
+  .tab[aria-selected="true"]::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: calc(100% - var(--lumo-space-m));
+    height: 2px;
+    transform: translateX(-50%);
+    border-radius: var(--lumo-border-radius-m) var(--lumo-border-radius-m) 0 0;
+    background: var(--lumo-primary-color);
+  }
+  .tab:focus-visible {
+    outline: none;
+    border-radius: var(--lumo-border-radius-m);
+    box-shadow: inset 0 0 0 2px var(--lumo-primary-color-50pct);
+  }
+
+  /* ---------------------------------------------- Overlay, menu, list items */
+  .overlay {
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-base-color);
+    box-shadow: 0 0 0 1px var(--lumo-shade-5pct), var(--lumo-box-shadow-m);
+    color: var(--lumo-body-text-color);
+  }
+  .overlay-content {
+    padding: var(--lumo-space-xs);
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--lumo-space-s);
+    width: 100%;
+    min-height: var(--lumo-size-m);
+    padding: 0.5em calc(var(--lumo-space-l) + var(--lumo-border-radius-m) / 4) 0.5em
+      calc(var(--lumo-space-m) + var(--lumo-border-radius-m) / 4);
+    border-radius: var(--lumo-border-radius-m);
+    color: var(--lumo-body-text-color);
+    font-size: 1rem;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+  }
+  .menu-item:hover {
+    background: var(--lumo-primary-color-10pct);
+  }
+  .menu-item:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--lumo-primary-color-50pct);
+  }
+  .menu-item-error {
+    color: var(--lumo-error-text-color);
+  }
+
+  /* ---------------------------------------------------------------- Dialog */
+  .dialog {
+    border-radius: var(--lumo-border-radius-l);
+    background: var(--lumo-base-color);
+    box-shadow: 0 0 0 1px var(--lumo-shade-5pct), var(--lumo-box-shadow-xl);
+    color: var(--lumo-body-text-color);
+  }
+  .dialog::backdrop {
+    background: var(--lumo-contrast-20pct);
+  }
+  .dialog-header {
+    padding: var(--lumo-space-m) var(--lumo-space-l) 0;
+  }
+  .dialog-title {
+    color: var(--lumo-header-text-color);
+    font-size: 1.375rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .dialog-content {
+    padding: var(--lumo-space-m) var(--lumo-space-l) var(--lumo-space-l);
+  }
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--lumo-space-s);
+    padding: var(--lumo-space-s) var(--lumo-space-m);
+    border-radius: 0 0 var(--lumo-border-radius-l) var(--lumo-border-radius-l);
+    background: var(--lumo-contrast-5pct);
+  }
+
+  /* -------------------------------------------- Inline notifications/alerts */
+  .notice {
+    display: flex;
+    gap: var(--lumo-space-s);
+    padding: var(--lumo-space-s) var(--lumo-space-m);
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-primary-color-10pct);
+    color: var(--lumo-primary-text-color);
+    font-size: 0.875rem;
+    line-height: 1.375;
+  }
+  .notice-success {
+    background: var(--lumo-success-color-10pct);
+    color: var(--lumo-success-text-color);
+  }
+  .notice-error {
+    background: var(--lumo-error-color-10pct);
+    color: var(--lumo-error-text-color);
+  }
+  .notice-warning {
+    background: var(--lumo-warning-color-10pct);
+    color: var(--lumo-warning-text-color);
+  }
+
+  /* ------------------------------------------------------------------ Card */
+  .card {
+    border-radius: var(--lumo-border-radius-l);
+    background: var(--lumo-base-color);
+    box-shadow: 0 0 0 1px var(--lumo-contrast-10pct);
+  }
 }
