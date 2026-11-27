@@ -1,0 +1,81 @@
+tests/db/02-exporter-access.test.mjs
+  s_a50acd1b03b8a4::t_fd9165d1a8cc5d 21
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1,3-10,12-20,22-71
+  s_a50acd1b03b8a4::t_cc23ac94c7426e 2
+  s_a50acd1b03b8a4::t_d6a974aade3d46 11
+docs/not-built-yet.md
+  s_a50acd1b03b8a4::t_115b77a2281c57 74,97
+tests/db/lib.mjs
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1-40
+components/manufacturer/nav.tsx
+  s_a50acd1b03b8a4::t_97d3ff473445f3 15
+tests/README.md
+  s_a50acd1b03b8a4::t_69de9672509d79 1-59
+components/exporter/nav.tsx
+  s_a50acd1b03b8a4::t_97d3ff473445f3 15
+tests/db/05-audit-trail.test.mjs
+  s_a50acd1b03b8a4::t_d6a974aade3d46 5
+  s_a50acd1b03b8a4::t_cc23ac94c7426e 2
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1,3-4,6-62
+package.json
+  s_a50acd1b03b8a4::t_2ae77ae68055cf 9-12
+components/app-shell.tsx
+  s_a50acd1b03b8a4::t_97d3ff473445f3 1,5,34-36,41-47,144-157
+  s_a50acd1b03b8a4::t_75c30580938990 158
+app/admin/audit/page.tsx
+  s_a50acd1b03b8a4::t_97d3ff473445f3 27
+tests/db/01-documents-and-sharing.test.mjs
+  s_a50acd1b03b8a4::t_d6a974aade3d46 2,11
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1,3-10,12-148
+app/admin/page.tsx
+  s_a50acd1b03b8a4::t_97d3ff473445f3 39
+tests/db/06-roles.test.mjs
+  s_a50acd1b03b8a4::t_fd9165d1a8cc5d 91
+  s_a50acd1b03b8a4::t_d6a974aade3d46 5
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1,3-4,6-90,92-99
+  s_a50acd1b03b8a4::t_cc23ac94c7426e 2
+components/user-menu.tsx
+  s_a50acd1b03b8a4::t_97d3ff473445f3 3-4,6,18,25-26,28,83-94,96-101
+  s_a50acd1b03b8a4::t_5c9d2dbd34314c 95,139-159
+  s_a50acd1b03b8a4::t_679cd3025df202 160-161
+tests/e2e/browser.mjs
+  s_a50acd1b03b8a4::t_2ae77ae68055cf 1-63
+tests/e2e/run.mjs
+  s_a50acd1b03b8a4::t_2ae77ae68055cf 1-30
+tests/e2e/seed.mjs
+  s_a50acd1b03b8a4::t_2ae77ae68055cf 1-63
+tests/e2e/smoke.test.mjs
+  s_a50acd1b03b8a4::t_2ae77ae68055cf 1-5,7-60
+  s_a50acd1b03b8a4::t_3e636a3b050b63 6
+tests/db/03-products.test.mjs
+  s_a50acd1b03b8a4::t_cc23ac94c7426e 2
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1,3-4,6-54
+  s_a50acd1b03b8a4::t_d6a974aade3d46 5
+tests/db/04-remove-exporter.test.mjs
+  s_a50acd1b03b8a4::t_d6a974aade3d46 4
+  s_a50acd1b03b8a4::t_cc23ac94c7426e 2
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1,3,5-44
+tests/db/run.mjs
+  s_a50acd1b03b8a4::t_717b5f08f709b2 1-20
+.gitignore
+  s_a50acd1b03b8a4::t_2ae77ae68055cf 43-45
+docs/how-the-app-works.md
+  s_a50acd1b03b8a4::t_5c9d2dbd34314c 126,201,240
+  s_a50acd1b03b8a4::t_ac4a13288a4638 281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "85db86e272e50b186b4e7671cba48a28b0f248ea",
+  "prompts": {},
+  "sessions": {
+    "s_a50acd1b03b8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46bd6840-fcbf-46f0-86fd-9217f45fd74c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jagadeesh J <jagadeesh@krylox.ai>"
+    }
+  }
+}
