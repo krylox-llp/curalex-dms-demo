@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import type { Permission } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
 export type OrgType = "manufacturer" | "exporter";
@@ -12,7 +13,14 @@ export type Account = {
   avatarUrl: string | null;
   isAdmin: boolean;
   org: Org | null;
+  roles: string[];
+  permissions: Permission[];
+  /** Membership exists but was deactivated by a company admin. */
+  deactivated: boolean;
 };
+
+export const can = (account: Pick<Account, "permissions">, permission: Permission) =>
+  account.permissions.includes(permission);
 
 export const ORG_TYPE_LABEL: Record<OrgType, string> = {
   manufacturer: "Manufacturer",
@@ -40,7 +48,14 @@ export const getAccount = cache(async (): Promise<Account | null> => {
   }
 
   const meta = (claims.user_metadata ?? {}) as { full_name?: string; avatar_url?: string };
-  const account = data as { email: string | null; is_admin: boolean; org: Org | null };
+  const account = data as {
+    email: string | null;
+    is_admin: boolean;
+    org: Org | null;
+    roles?: string[];
+    permissions?: Permission[];
+    deactivated?: boolean;
+  };
 
   return {
     email: account.email ?? String(claims.email ?? ""),
@@ -48,6 +63,9 @@ export const getAccount = cache(async (): Promise<Account | null> => {
     avatarUrl: meta.avatar_url ?? null,
     isAdmin: account.is_admin,
     org: account.org,
+    roles: account.roles ?? [],
+    permissions: account.permissions ?? [],
+    deactivated: account.deactivated ?? false,
   };
 });
 
@@ -68,10 +86,15 @@ export async function requireAccount(area: Area): Promise<Account> {
   if (!account) redirect("/login");
 
   const home = homeFor(account);
-  if (!home) redirect("/login?error=not_invited");
+  if (!home) redirect(account.deactivated ? "/login?error=deactivated" : "/login?error=not_invited");
 
   const allowed = area === "admin" ? account.isAdmin : account.org?.type === area;
   if (!allowed) redirect(home);
 
   return account;
+}
+
+/** Redirects to the user's workspace home when they lack a permission (e.g. a page only some roles may open). */
+export function requirePermission(account: Account, permission: Permission, fallback: string): void {
+  if (!can(account, permission)) redirect(fallback);
 }

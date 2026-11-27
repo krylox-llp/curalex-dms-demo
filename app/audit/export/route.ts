@@ -4,7 +4,8 @@ import { ACTION_LABEL, getAuditEntries, parseFilters } from "@/lib/audit";
 /** CSV export of the audit trail the caller can see (RLS), with the current filters. */
 export async function GET(req: NextRequest) {
   const filters = parseFilters(Object.fromEntries(req.nextUrl.searchParams));
-  const { entries } = await getAuditEntries(filters, 10000);
+  const { entries, setupError } = await getAuditEntries(filters, 10000);
+  if (setupError) return new NextResponse(setupError, { status: 503, headers: { "content-type": "text/plain; charset=utf-8" } });
   const cols = [
     "id", "at_utc", "user", "action", "action_label", "record", "table", "operation", "record_id",
     "document_id", "changed_fields", "reason", "old_data", "new_data", "prev_hash", "row_hash",

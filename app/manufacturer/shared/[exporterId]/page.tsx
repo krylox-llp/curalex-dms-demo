@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { ExporterMenu } from "@/components/manufacturer/remove-exporter";
 import { SharesTable, type ShareRow } from "@/components/manufacturer/shares-table";
-import { requireAccount } from "@/lib/account";
+import { can, requireAccount } from "@/lib/account";
 import { folderPathLabel, getFolders, isUuid } from "@/lib/documents";
 import { createClient } from "@/lib/supabase/server";
 
@@ -45,12 +45,12 @@ async function ExporterShares({ params, searchParams }: PageProps<"/manufacturer
         breadcrumb={<Breadcrumbs items={[{ label: "Shared with", href: "/manufacturer/shared" }, { label: exporter.name }]} />}
         actions={
           <>
-            <Link href={`/manufacturer?to=${exporter.org_id}`} className="btn-primary">Share files</Link>
-            <ExporterMenu
+            {can(account, "sharing.share") && <Link href={`/manufacturer?to=${exporter.org_id}`} className="btn-primary">Share files</Link>}
+            {can(account, "exporters.remove") && <ExporterMenu
               exporter={{ id: exporter.org_id, name: exporter.name }}
               liveFiles={rows.filter((r) => !r.expiresAt || new Date(r.expiresAt).getTime() > now).length}
               redirectTo="/manufacturer/shared"
-            />
+            />}
           </>
         }
       />
@@ -67,7 +67,7 @@ async function ExporterShares({ params, searchParams }: PageProps<"/manufacturer
         </p>
       )}
 
-      <SharesTable rows={rows} now={now} />
+      <SharesTable rows={rows} now={now} showActivity={can(account, "activity.view")} />
     </AppShell>
   );
 }

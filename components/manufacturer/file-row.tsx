@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { DeleteDialog } from "@/components/manufacturer/delete-dialog";
+import { useCan } from "@/components/permissions";
 import { DownloadIcon, FileIcon } from "@/components/manufacturer/icons";
 import { RowMenu } from "@/components/manufacturer/row-menu";
 import { useSelection } from "@/components/manufacturer/selection";
@@ -23,6 +24,9 @@ async function downloadVersion(name: string, version: Version) {
 
 export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId: string | null }) {
   const router = useRouter();
+  const canEdit = useCan("documents.edit");
+  const canDelete = useCan("documents.delete");
+  const canSelect = useCan("sharing.share") || canDelete;
   const { selection, select, unselect } = useSelection();
   const chosen = selection[doc.id];
   const [localVersionId, setLocalVersionId] = useState(doc.versions[0].id);
@@ -48,13 +52,15 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
     <Fragment>
       <tr aria-selected={Boolean(chosen)}>
         <td className="w-10">
-          <input
-            type="checkbox"
-            aria-label={`Select ${doc.name}`}
-            checked={Boolean(chosen)}
-            onChange={(e) => (e.target.checked ? select(doc.id, version.id) : unselect(doc.id))}
-            className="checkbox"
-          />
+          {canSelect && (
+            <input
+              type="checkbox"
+              aria-label={`Select ${doc.name}`}
+              checked={Boolean(chosen)}
+              onChange={(e) => (e.target.checked ? select(doc.id, version.id) : unselect(doc.id))}
+              className="checkbox"
+            />
+          )}
         </td>
         <td className="max-w-0 w-[45%]">
           <span className="flex items-center gap-2.5 font-medium text-header">
@@ -88,7 +94,7 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
         <td className="whitespace-nowrap text-secondary">{dateFmt.format(new Date(version.created_at))}</td>
         <td className="w-px whitespace-nowrap text-right">
           <span className="inline-flex items-center">
-            <UploadButton folderId={folderId} asName={doc.name} />
+            {canEdit && <UploadButton folderId={folderId} asName={doc.name} />}
             <button
               type="button"
               onClick={() => download(version)}
@@ -106,12 +112,14 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
                   onSelect: () => setShowHistory((s) => !s),
                 },
                 { label: "Audit history", onSelect: () => router.push(`/manufacturer/audit?document=${doc.id}`) },
-                {
-                  label: "Delete file",
-                  separatorBefore: true,
-                  danger: true,
-                  onSelect: () => setDeleting({ target: { kind: "documents", ids: [doc.id] }, label: doc.name }),
-                },
+                ...(canDelete
+                  ? [{
+                      label: "Delete file",
+                      separatorBefore: true,
+                      danger: true,
+                      onSelect: () => setDeleting({ target: { kind: "documents", ids: [doc.id] }, label: doc.name }),
+                    }]
+                  : []),
               ]}
             />
           </span>
@@ -141,7 +149,7 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
                         <button type="button" onClick={() => download(v)} className="btn-tertiary btn-sm">
                           Download
                         </button>
-                        <button
+                        {canDelete && <button
                           type="button"
                           onClick={() =>
                             setDeleting({
@@ -152,7 +160,7 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
                           className="btn-error btn-tertiary btn-sm"
                         >
                           Delete
-                        </button>
+                        </button>}
                       </td>
                     </tr>
                   ))}

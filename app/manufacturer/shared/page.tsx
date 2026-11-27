@@ -5,7 +5,7 @@ import { AppShell, AppShellSkeleton, PageHeader, StatusBadge, dateFormat } from 
 import { InviteExporterButton } from "@/components/manufacturer/invite-exporter-dialog";
 import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { ExporterMenu } from "@/components/manufacturer/remove-exporter";
-import { requireAccount } from "@/lib/account";
+import { can, requireAccount } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Shared with · CuraLex - DMS" };
@@ -40,7 +40,7 @@ async function SharedWith() {
       <PageHeader
         title="Shared with"
         description="Exporters you work with and the documents they can access. Only exporters you invite can receive documents."
-        actions={<InviteExporterButton />}
+        actions={can(account, "exporters.invite") ? <InviteExporterButton /> : undefined}
       />
 
       <div className="data-grid">
@@ -84,7 +84,7 @@ async function SharedWith() {
                   {e.lastShared ? dateFormat.format(new Date(e.lastShared)) : "—"}
                 </td>
                 <td className="whitespace-nowrap text-right">
-                  <ExporterMenu exporter={{ id: e.id, name: e.name }} liveFiles={e.files - e.expired} />
+                  {can(account, "exporters.remove") && <ExporterMenu exporter={{ id: e.id, name: e.name }} liveFiles={e.files - e.expired} />}
                   <Link
                     href={`/manufacturer/shared/${e.id}`}
                     aria-label={`Open ${e.name}`}

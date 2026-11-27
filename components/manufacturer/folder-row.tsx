@@ -5,10 +5,12 @@ import { useState } from "react";
 import { DeleteDialog } from "@/components/manufacturer/delete-dialog";
 import { FolderIcon } from "@/components/manufacturer/icons";
 import { RowMenu } from "@/components/manufacturer/row-menu";
+import { useCan } from "@/components/permissions";
 import type { Folder } from "@/lib/documents-shared";
 
 export function FolderRow({ folder }: { folder: Folder }) {
   const [deleting, setDeleting] = useState(false);
+  const canDelete = useCan("documents.delete");
   return (
     <tr className="hover:bg-contrast-5">
       <td />
@@ -19,7 +21,9 @@ export function FolderRow({ folder }: { folder: Folder }) {
         </Link>
       </td>
       <td className="text-right">
-        <RowMenu label={`Actions for folder ${folder.name}`} items={[{ label: "Delete folder", danger: true, onSelect: () => setDeleting(true) }]} />
+        {canDelete && (
+          <RowMenu label={`Actions for folder ${folder.name}`} items={[{ label: "Delete folder", danger: true, onSelect: () => setDeleting(true) }]} />
+        )}
         {deleting && (
           <DeleteDialog target={{ kind: "folder", id: folder.id }} label={folder.name} onClose={() => setDeleting(false)} />
         )}

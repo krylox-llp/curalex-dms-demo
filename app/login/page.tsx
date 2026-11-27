@@ -67,7 +67,9 @@ async function ChooserError({ searchParams }: Pick<PageProps<"/login">, "searchP
     <ErrorAlert>
       {error === "not_invited"
         ? "This Google account hasn't been invited to CuraLex. Sign in with the email your invitation was sent to."
-        : "We couldn't complete sign-in with Google. Please try again."}
+        : error === "deactivated"
+          ? "Your access to CuraLex has been deactivated by your company admin. Contact them if you need access again."
+          : "We couldn't complete sign-in with Google. Please try again."}
     </ErrorAlert>
   );
 }

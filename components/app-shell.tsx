@@ -1,4 +1,5 @@
 import { Logo } from "@/components/logo";
+import { PermissionsProvider } from "@/components/permissions";
 import { UserMenu } from "@/components/user-menu";
 import { ORG_TYPE_LABEL, type Account } from "@/lib/account";
 
@@ -24,6 +25,7 @@ export function AppShell({
       : { name: "CuraLex - DMS", role: "Platform admin" };
 
   return (
+    <PermissionsProvider permissions={account.permissions}>
     <div className="flex flex-1 flex-col bg-base">
       <header className="border-b border-contrast-10 bg-base">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -39,6 +41,7 @@ export function AppShell({
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
     </div>
+    </PermissionsProvider>
   );
 }
 

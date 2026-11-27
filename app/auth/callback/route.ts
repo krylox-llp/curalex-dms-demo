@@ -26,11 +26,11 @@ export async function GET(request: NextRequest) {
     return redirectTo(`${loginPage}?error=auth_failed`);
   }
 
-  const account = data as { is_admin: boolean; org: Org | null };
+  const account = data as { is_admin: boolean; org: Org | null; deactivated?: boolean };
   const home = homeFor({ isAdmin: account.is_admin, org: account.org });
   if (!home) {
     await supabase.auth.signOut();
-    return redirectTo(`${loginPage}?error=not_invited`);
+    return redirectTo(`${loginPage}?error=${account.deactivated ? "deactivated" : "not_invited"}`);
   }
 
   // Signed in through the other role's page: point them to the right one.

@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { NewFppButton } from "@/components/exporter/fpp-controls";
 import { ExporterNav } from "@/components/exporter/nav";
-import { requireAccount } from "@/lib/account";
+import { can, requireAccount } from "@/lib/account";
 import { getFpps, getManufacturerOptions, getSharedDocuments, isExpiringSoon } from "@/lib/exporter/data";
 
 export const metadata: Metadata = { title: "Products · CuraLex - DMS" };
@@ -26,7 +26,7 @@ async function Fpps() {
       <PageHeader
         title="Products"
         description="Each finished pharmaceutical product (FPP) with the manufacturers behind it and their documents in one place."
-        actions={<NewFppButton />}
+        actions={can(account, "products.edit") ? <NewFppButton /> : undefined}
       />
       <div className="data-grid">
         <table>

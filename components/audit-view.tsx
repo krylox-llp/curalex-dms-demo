@@ -3,7 +3,8 @@ import { ACTION_LABEL, CATEGORIES, describeChange, formatUtc, getAuditEntries, t
 
 /** Audit trail table with filters, paging and CSV export (server component). */
 export async function AuditView({ basePath, filters }: { basePath: string; filters: AuditFilters }) {
-  const { entries, more } = await getAuditEntries(filters);
+  const { entries, more, setupError } = await getAuditEntries(filters);
+  if (setupError) return <p role="alert" className="notice notice-warning">{setupError}</p>;
   const params = (extra: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
     for (const [k, v] of Object.entries({ category: filters.category, q: filters.q, document: filters.document, ...extra }))

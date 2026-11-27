@@ -8,7 +8,7 @@ export type EmailStatus = { sent: true } | { sent: false; error: string };
 
 /** Emails an invitation (or "you've been added") on behalf of the signed-in user's company. */
 export async function sendInviteEmail(p: {
-  kind: "invited" | "added";
+  kind: "invited" | "added" | "colleague";
   role: "manufacturer" | "exporter";
   companyName: string;
   email: string;

@@ -5,7 +5,7 @@ import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { ShareForm, type ShareFile } from "@/components/manufacturer/share-form";
-import { requireAccount } from "@/lib/account";
+import { requireAccount, requirePermission } from "@/lib/account";
 import { folderPathLabel, getFolders, isUuid } from "@/lib/documents";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,6 +21,7 @@ export default function SharePage({ searchParams }: PageProps<"/manufacturer/sha
 
 async function Share({ searchParams }: Pick<PageProps<"/manufacturer/share">, "searchParams">) {
   const account = await requireAccount("manufacturer");
+  requirePermission(account, "sharing.share", "/manufacturer");
   const { v, to } = await searchParams;
   const ids = (typeof v === "string" ? v.split(",") : []).filter(isUuid).slice(0, 200);
 

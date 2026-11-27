@@ -5,6 +5,7 @@ import { removeFppDocument } from "@/app/exporter/actions";
 import { AccessUntil } from "@/components/access-badge";
 import { DownloadIcon, FileIcon } from "@/components/manufacturer/icons";
 import { RowMenu } from "@/components/manufacturer/row-menu";
+import { useCan } from "@/components/permissions";
 import type { SharedDoc } from "@/lib/exporter/shared";
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -28,6 +29,8 @@ export function DocsTable({
   showManufacturer?: boolean;
 }) {
   const [pending, start] = useTransition();
+  const canDownload = useCan("documents.download");
+  const canEdit = useCan("products.edit");
   const cols = showManufacturer ? 6 : 5;
   return (
     <div className="data-grid">
@@ -76,17 +79,17 @@ export function DocsTable({
                       <a href={`/documents/${d.share_id}/view`} target="_blank" rel="noopener" className="btn-tertiary btn-sm">
                         View
                       </a>
-                      <a
+                      {canDownload && <a
                         href={`/documents/${d.share_id}/download`}
                         title="Download"
                         aria-label={`Download ${d.file_name}`}
                         className="btn-tertiary btn-icon btn-sm"
                       >
                         <DownloadIcon className="size-4" />
-                      </a>
+                      </a>}
                     </>
                   )}
-                  {fppId && (
+                  {fppId && canEdit && (
                     <RowMenu
                       label={`Actions for ${d.file_name}`}
                       items={[

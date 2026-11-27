@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocsTable } from "@/components/exporter/docs-table";
 import { AddDocumentsButton, AddManufacturerButton, FppMenu, ManufacturerMenu } from "@/components/exporter/fpp-controls";
 import { ExporterNav } from "@/components/exporter/nav";
-import { requireAccount } from "@/lib/account";
+import { can, requireAccount } from "@/lib/account";
 import { isUuid } from "@/lib/documents-shared";
 import { getFpp, getManufacturerOptions, getSharedDocuments, roleLabel } from "@/lib/exporter/data";
 
@@ -35,10 +35,12 @@ async function FppDetail({ params }: PageProps<"/exporter/fpps/[fppId]">) {
         description={fpp.details ?? undefined}
         breadcrumb={<Breadcrumbs items={[{ label: "Products", href: "/exporter" }, { label: fpp.name }]} />}
         actions={
-          <>
-            <AddManufacturerButton fppId={fpp.id} options={addable} />
-            <FppMenu fpp={fpp} />
-          </>
+          can(account, "products.edit") ? (
+            <>
+              <AddManufacturerButton fppId={fpp.id} options={addable} />
+              <FppMenu fpp={fpp} />
+            </>
+          ) : undefined
         }
       />
 
@@ -49,9 +51,11 @@ async function FppDetail({ params }: PageProps<"/exporter/fpps/[fppId]">) {
             Add the manufacturers behind this product, such as the finished product and API manufacturers, then pick
             the documents each has shared with you.
           </p>
-          <div className="mt-5 flex justify-center">
-            <AddManufacturerButton fppId={fpp.id} options={addable} variant="secondary" />
-          </div>
+          {can(account, "products.edit") && (
+            <div className="mt-5 flex justify-center">
+              <AddManufacturerButton fppId={fpp.id} options={addable} variant="secondary" />
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-8">
@@ -65,10 +69,12 @@ async function FppDetail({ params }: PageProps<"/exporter/fpps/[fppId]">) {
                     {s.docs.length} document{s.docs.length === 1 ? "" : "s"}
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <AddDocumentsButton fppId={fpp.id} manufacturerName={s.name} available={s.available} />
-                  <ManufacturerMenu fppId={fpp.id} manufacturer={{ id: s.id, name: s.name, role: s.role, docCount: s.docs.length }} />
-                </div>
+                {can(account, "products.edit") && (
+                  <div className="flex items-center gap-1">
+                    <AddDocumentsButton fppId={fpp.id} manufacturerName={s.name} available={s.available} />
+                    <ManufacturerMenu fppId={fpp.id} manufacturer={{ id: s.id, name: s.name, role: s.role, docCount: s.docs.length }} />
+                  </div>
+                )}
               </div>
               {s.unavailable > 0 && (
                 <p className="notice notice-warning mb-3">

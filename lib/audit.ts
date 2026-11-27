@@ -90,8 +90,15 @@ export function parseFilters(params: Record<string, string | string[] | undefine
   };
 }
 
+export const AUDIT_NOT_SET_UP =
+  "The audit trail isn't set up on this database yet. Run supabase/migrations/20261127080000_audit_trail.sql " +
+  "(then, if needed: notify pgrst, 'reload schema';).";
+
 /** Audit entries visible to the caller (RLS), newest first. */
-export async function getAuditEntries(f: AuditFilters, limit = 100): Promise<{ entries: AuditEntry[]; more: boolean }> {
+export async function getAuditEntries(
+  f: AuditFilters,
+  limit = 100,
+): Promise<{ entries: AuditEntry[]; more: boolean; setupError?: string }> {
   const supabase = await createClient();
   let query = supabase
     .from("audit_log")
@@ -108,6 +115,8 @@ export async function getAuditEntries(f: AuditFilters, limit = 100): Promise<{ e
     if (q) query = query.or(`subject_name.ilike.%${q}%,actor_email.ilike.%${q}%,reason.ilike.%${q}%`);
   }
   const { data, error } = await query;
+  // PGRST205: table missing from the API schema (migration not run on this project).
+  if (error?.code === "PGRST205") return { entries: [], more: false, setupError: AUDIT_NOT_SET_UP };
   if (error) throw new Error(error.message);
   const rows = data as AuditEntry[];
   return { entries: rows.slice(0, limit), more: rows.length > limit };

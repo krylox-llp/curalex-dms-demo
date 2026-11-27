@@ -11,7 +11,7 @@ import { SelectionBar } from "@/components/manufacturer/selection-bar";
 import { ShareTargetBanner } from "@/components/manufacturer/share-target";
 import { createClient } from "@/lib/supabase/server";
 import { UploadButton } from "@/components/manufacturer/upload";
-import { requireAccount } from "@/lib/account";
+import { can, requireAccount } from "@/lib/account";
 import { folderTrail, getDocuments, getFolders, isUuid } from "@/lib/documents";
 
 export const metadata: Metadata = { title: "Documents · CuraLex - DMS" };
@@ -58,8 +58,12 @@ async function Documents({ searchParams }: Pick<PageProps<"/manufacturer">, "sea
         }
         actions={
           <>
-            <NewFolderButton parentId={folderId} />
-            <UploadButton folderId={folderId} />
+            {can(account, "documents.edit") && (
+              <>
+                <NewFolderButton parentId={folderId} />
+                <UploadButton folderId={folderId} />
+              </>
+            )}
           </>
         }
       />

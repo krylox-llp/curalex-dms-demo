@@ -64,6 +64,8 @@ async function RoleSignInForm({ role, searchParams }: { role: OrgType; searchPar
           This Google account hasn&apos;t been invited as {role === "exporter" ? "an" : "a"} {role}. Sign in with the
           email your invitation was sent to.
         </ErrorAlert>
+      ) : error === "deactivated" ? (
+        <ErrorAlert>Your access has been deactivated by your company admin. Contact them if you need access again.</ErrorAlert>
       ) : error ? (
         <ErrorAlert>We couldn&apos;t complete sign-in with Google. Please try again.</ErrorAlert>
       ) : null}

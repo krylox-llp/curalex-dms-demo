@@ -6,6 +6,7 @@ import { AccessUntil } from "@/components/access-badge";
 import { Dialog } from "@/components/dialog";
 import { ReasonField } from "@/components/reason-field";
 import { FileIcon } from "@/components/manufacturer/icons";
+import { useCan } from "@/components/permissions";
 import { RowMenu } from "@/components/manufacturer/row-menu";
 import { DURATIONS } from "@/lib/documents-shared";
 
@@ -40,7 +41,9 @@ const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short
 
 
 /** Documents shared with one exporter: change duration or revoke one, selected or all. */
-export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
+export function SharesTable({ rows, now, showActivity = true }: { rows: ShareRow[]; now: number; showActivity?: boolean }) {
+  const canShare = useCan("sharing.share");
+  const canRevoke = useCan("sharing.revoke");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // Shares awaiting a revoke confirmation (one row, the ticked rows, or all).
   const [revoking, setRevoking] = useState<string[] | null>(null);
@@ -79,7 +82,7 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
           {rows.length} shared file{rows.length === 1 ? "" : "s"}
         </span>
 
-        {selectedIds.length > 0 ? (
+        {!canRevoke ? null : selectedIds.length > 0 ? (
           <div className="flex items-center gap-2">
             <span className="text-sm text-secondary">{selectedIds.length} selected</span>
             <button type="button" className="btn-tertiary btn-sm" onClick={() => setSelected(new Set())}>Clear</button>
@@ -131,20 +134,20 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
           <thead>
             <tr>
               <th className="w-10">
-                <input
+                {canRevoke && <input
                   type="checkbox"
                   aria-label="Select all"
                   checked={allChecked}
                   disabled={rows.length === 0}
                   onChange={(e) => setSelected(e.target.checked ? new Set(rows.map((r) => r.id)) : new Set())}
                   className="checkbox"
-                />
+                />}
               </th>
               <th>File</th>
               <th>Version</th>
               <th>Shared</th>
               <th>Access until</th>
-              <th>Activity</th>
+              {showActivity && <th>Activity</th>}
               <th className="w-12"><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
@@ -157,7 +160,7 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
             {rows.map((r) => (
               <tr key={r.id} aria-selected={selected.has(r.id)}>
                 <td>
-                  <input
+                  {canRevoke && <input
                     type="checkbox"
                     aria-label={`Select ${r.fileName}`}
                     checked={selected.has(r.id)}
@@ -170,7 +173,7 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
                       })
                     }
                     className="checkbox"
-                  />
+                  />}
                 </td>
                 <td className="max-w-0 w-[36%]">
                   <span className="flex items-center gap-2.5">
@@ -184,19 +187,24 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
                 <td className="text-secondary">v{r.version}</td>
                 <td className="whitespace-nowrap text-secondary">{dateFmt.format(new Date(r.sharedAt))}</td>
                 <td><AccessUntil expiresAt={r.expiresAt} now={now} /></td>
-                <td><Activity a={r.activity} /></td>
+                {showActivity && <td><Activity a={r.activity} /></td>}
                 <td className="text-right">
-                  <RowMenu
-                    label={`Actions for ${r.fileName}`}
-                    items={[
-                      { heading: "Access from today" },
-                      ...DURATIONS.map((d) => ({
-                        label: d.label,
-                        onSelect: () => run(() => setShareDuration(r.id, d.days)),
-                      })),
-                      { label: "Revoke access", danger: true, separatorBefore: true, onSelect: () => askRevoke([r.id]) },
-                    ]}
-                  />
+                  {(canShare || canRevoke) && (
+                    <RowMenu
+                      label={`Actions for ${r.fileName}`}
+                      items={[
+                        ...(canShare
+                          ? [
+                              { heading: "Access from today" },
+                              ...DURATIONS.map((d) => ({ label: d.label, onSelect: () => run(() => setShareDuration(r.id, d.days)) })),
+                            ]
+                          : []),
+                        ...(canRevoke
+                          ? [{ label: "Revoke access", danger: true, separatorBefore: canShare, onSelect: () => askRevoke([r.id]) }]
+                          : []),
+                      ]}
+                    />
+                  )}
                 </td>
               </tr>
             ))}

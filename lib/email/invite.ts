@@ -21,7 +21,7 @@ const ROLE_COPY: Record<Role, { label: string; what: string }> = {
  * All user-provided text is HTML-escaped.
  */
 export function inviteEmail(p: {
-  kind: "invited" | "added";
+  kind: "invited" | "added" | "colleague";
   role: Role;
   /** Recipient's company as entered by the inviter (or their existing company). */
   companyName: string;
@@ -34,6 +34,7 @@ export function inviteEmail(p: {
   extra?: string;
 }) {
   const role = ROLE_COPY[p.role];
+  if (p.kind === "colleague") return colleagueEmail(p);
   const subject =
     p.kind === "invited"
       ? `${p.invitedBy} invited you to CuraLex - DMS`
@@ -85,5 +86,22 @@ export function inviteEmail(p: {
 </td></tr></table>
 </body></html>`;
 
+  return { subject, html, text };
+}
+
+/** A company admin invites a colleague into their own company. `extra` lists the roles. */
+function colleagueEmail(p: { companyName: string; inviterName?: string | null; email: string; loginUrl: string; extra?: string }) {
+  const subject = `${p.inviterName ?? p.companyName} invited you to join ${p.companyName} on CuraLex - DMS`;
+  const lead = p.inviterName ? `${p.inviterName} has invited you` : "You have been invited";
+  const intro = `${lead} to join ${p.companyName} on CuraLex - DMS, the platform your company uses to manage and share export and quality documents.`;
+  const text = [intro, ...(p.extra ? ["", p.extra] : []), "", `Accept invitation: ${p.loginUrl}`, "", `Sign in with Google using this email address: ${p.email}`].join("\n");
+  const html = `<!doctype html><html><body style="margin:0;padding:32px 16px;background:#f4f6f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2a37;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fff;border-radius:8px;box-shadow:0 0 0 1px rgba(26,57,96,0.1);">
+<tr><td style="padding:24px 32px 0;"><span style="font-size:18px;font-weight:600;color:#1a2a3c;">Cura<span style="color:#0062db;">Lex</span></span><span style="font-size:18px;color:#5b6b7f;border-left:1px solid #d3dae3;margin-left:10px;padding-left:10px;">DMS</span></td></tr>
+<tr><td style="padding:24px 32px 8px;"><h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;font-weight:600;color:#1a2a3c;">${esc(subject)}</h1>
+<p style="margin:0 0 12px;font-size:15px;line-height:1.6;">${esc(intro)}</p>${p.extra ? `<p style="margin:0 0 12px;font-size:15px;line-height:1.6;">${esc(p.extra)}</p>` : ""}</td></tr>
+<tr><td style="padding:12px 32px 8px;"><a href="${esc(p.loginUrl)}" style="display:inline-block;background:#0062f5;color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:11px 20px;border-radius:4px;">Accept invitation</a></td></tr>
+<tr><td style="padding:12px 32px 24px;"><p style="margin:0;font-size:13px;line-height:1.6;color:#5b6b7f;">Sign in with Google using <strong style="color:#1f2a37;">${esc(p.email)}</strong>.</p></td></tr>
+</table></body></html>`;
   return { subject, html, text };
 }
