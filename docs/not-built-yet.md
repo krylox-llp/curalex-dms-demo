@@ -71,7 +71,7 @@ Everything discussed or planned that does not exist in the app yet, grouped by a
 | **Intended-use decision** | System of record vs controlled distribution channel; sets validation scope | Compliance §1 |
 | **Validation package** | Validation plan, URS, risk assessment, supplier assessments (Supabase, Vercel, Google, Resend), FS/DS, traceability matrix, IQ/OQ/PQ, summary report | CSV / GAMP 5 / V-Model; Schedule M §20.1–20.2; compliance 4.5 |
 | **SOPs and training** | User management, change control, backup/restore, incidents, e-signatures, periodic review; training records | Schedule M §20.5, §20.7–20.8; compliance 4.5 |
-| **Test suites in the repo + CI** | The ~225 database/API and browser checks used during development live in a scratch folder; move into the repo under change control with retained evidence | Compliance 4.5 |
+| **CI for the test suites** | Suites are now in `tests/` (`pnpm test`: ~190 database checks + browser smoke test). Still to do: run them in CI on every change, trace them to requirements, retain the output as evidence | Compliance 4.5 |
 | **Environments** | Separate dev / test / prod Supabase projects; release tagging | Annex 11 §10; Schedule M §20.8 |
 | **Backup and restore** | Point-in-time recovery (Supabase Pro add-on) and a tested restore procedure | Schedule M §20.9; Annex 11 §7 |
 | **Hosted Postgres check** | Verify the "permission denied for function" crash seen on local `supabase/postgres 17.12.0.000` on the hosted version; record as a deviation | Compliance §3.3 |
@@ -94,6 +94,6 @@ Everything discussed or planned that does not exist in the app yet, grouped by a
 3. Superseded badges and per-share view-only.
 4. Session timeout + MFA + sign-in events.
 5. Inspector export.
-6. Validation package and moving the test suites into the repo (in parallel throughout).
+6. Validation package and CI for the test suites (in parallel throughout).
 
 Sizes: S ≈ up to 2 days, M ≈ 3–5 days, L ≈ 1–2 weeks (one developer with assistance; rough).

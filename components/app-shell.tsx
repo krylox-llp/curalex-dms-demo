@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { PermissionsProvider } from "@/components/permissions";
 import { UserMenu } from "@/components/user-menu";
-import { ORG_TYPE_LABEL, type Account } from "@/lib/account";
+import { can, ORG_TYPE_LABEL, type Account } from "@/lib/account";
 
 /**
  * Signed-in layout: CuraLex logo on the left, avatar menu (with the user's company) on the right.
@@ -30,12 +31,20 @@ export function AppShell({
       <header className="border-b border-contrast-10 bg-base">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <Logo size="sm" />
+            <Link href="/" aria-label="CuraLex - DMS home" className="rounded-lumo-m focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-50">
+              <Logo size="sm" />
+            </Link>
             {area === "admin" && (
               <span className="badge badge-contrast badge-sm">Admin</span>
             )}
           </div>
-          <UserMenu name={account.name} email={account.email} avatarUrl={account.avatarUrl} company={company} />
+          <UserMenu
+            name={account.name}
+            email={account.email}
+            avatarUrl={account.avatarUrl}
+            company={company}
+            links={profileLinks(account, area)}
+          />
         </div>
         {nav && <div className="mx-auto max-w-6xl px-6">{nav}</div>}
       </header>
@@ -131,4 +140,19 @@ export function PageHeader({
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
+}
+
+/** Links shown in the profile menu: Audit trail and Team (per permission), or the admin pages. */
+function profileLinks(account: Account, area: "admin" | "company") {
+  if (area === "admin") {
+    return [
+      { href: "/admin", label: "Companies" },
+      { href: "/admin/audit", label: "Audit trail" },
+    ];
+  }
+  const base = `/${account.org?.type ?? ""}`;
+  return [
+    ...(can(account, "audit.view") ? [{ href: `${base}/audit`, label: "Audit trail" }] : []),
+    ...(can(account, "users.manage") ? [{ href: `${base}/team`, label: "Team" }] : []),
+  ];
 }

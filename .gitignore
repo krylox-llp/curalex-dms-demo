@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 !.env.example
+
+# e2e test state (sessions, screenshots, browser profile)
+/tests/e2e/.state/

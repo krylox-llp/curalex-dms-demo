@@ -123,7 +123,7 @@ If a manufacturer invites an email that already belongs to (or is invited to) an
 
 ## 4. The manufacturer workspace
 
-Tabs: **Documents | Shared with | Audit trail | Team** (Audit trail and Team only for roles allowed to see them). The header shows the CuraLex - DMS logo; clicking the avatar shows the user's name, email, company and **Sign out**.
+Tabs: **Documents | Shared with**. The header shows the CuraLex - DMS logo (links home); clicking the avatar opens the profile menu: name, email, company, **Audit trail** and **Team** (only for roles allowed to use them) and **Sign out**.
 
 ### 4.1 Documents (`/manufacturer`)
 
@@ -198,7 +198,7 @@ Share history and the access log are kept. Re-inviting the same email reconnects
 
 ## 5. The exporter workspace
 
-Tabs: **Products | Shared with me | Audit trail | Team** (Audit trail for Company admin and Regulatory / quality; Team for Company admin). Viewers can view documents in the browser but not download them or edit products.
+Tabs: **Products | Shared with me**. **Audit trail** (Company admin, Regulatory / quality) and **Team** (Company admin) are in the profile menu. Viewers can view documents in the browser but not download them or edit products.
 
 ### 5.1 Products (`/exporter`)
 
@@ -237,7 +237,7 @@ Anything else gets **403**. Exporters cannot read the storage bucket directly.
 
 ## 6. The admin workspace
 
-Tabs: **Companies | Audit trail**. The header shows "CuraLex - DMS · Admin".
+No tab bar; **Companies** and **Audit trail** are in the profile menu. The header shows "CuraLex - DMS · Admin".
 
 - **Companies** (`/admin`): invite a company (company name, contact email, role) and see every company with role, contact, who invited it, invitation date and status (Active or Invited).
 - **Audit trail** (`/admin/audit`): all activity across the platform, plus an **integrity check** that re-computes the audit hash chain ("Integrity check passed: N entries verified, hash chain intact.").
@@ -278,7 +278,7 @@ Each entry stores: database timestamp (`clock_timestamp()`), user ID and email, 
 
 ### 7.5 Screens
 
-- **Audit trail** tab for manufacturers, exporters and admins, with a category filter (Documents, Sharing, Views & downloads, Companies & users, Products), search (file, user or reason), "Older entries" paging and **Export CSV**.
+- **Audit trail** page (profile menu) for manufacturers, exporters and admins, with a category filter (Documents, Sharing, Views & downloads, Companies & users, Products), search (file, user or reason), "Older entries" paging and **Export CSV**.
 - **Per-document history:** a file's ⋯ → Audit history (`?document=<id>`).
 - **CSV export** (`/audit/export`): full old and new values and hashes, UTF-8 with BOM, protected against spreadsheet formula injection.
 - Times are shown in **UTC**.

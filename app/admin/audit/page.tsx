@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AdminNav } from "@/components/admin-nav";
 import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { AuditView } from "@/components/audit-view";
 import { requireAccount } from "@/lib/account";
@@ -25,7 +24,7 @@ async function AdminAudit({ searchParams }: Pick<PageProps<"/admin/audit">, "sea
   const result = chain as { ok: boolean; checked: number; broken_at?: number } | null;
 
   return (
-    <AppShell account={account} area="admin" nav={<AdminNav />}>
+    <AppShell account={account} area="admin">
       <PageHeader title="Audit trail" description="All activity across CuraLex - DMS. Entries are append-only and hash-chained." />
       {result && (
         <p role="status" className={`notice mb-4 ${result.ok ? "notice-success" : "notice-error"}`}>
