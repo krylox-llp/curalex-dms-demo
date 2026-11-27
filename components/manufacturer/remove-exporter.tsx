@@ -43,7 +43,7 @@ export function ExporterMenu({
           onClose={() => setOpen(false)}
           footer={
             <>
-              <button type="button" className="btn-tertiary" onClick={() => setOpen(false)} disabled={pending}>
+              <button type="button" className="btn-tertiary" onClick={() => setOpen(false)} disabled={pending} data-autofocus>
                 Cancel
               </button>
               <button type="button" className="btn-error-primary" onClick={confirm} disabled={pending}>

@@ -298,8 +298,13 @@ h3 {
     background: var(--lumo-contrast-5pct);
     color: var(--lumo-disabled-text-color);
   }
+  /* Show errors only after the user has interacted (modern-web-guidance `validate-input-after-interaction`). */
+  .text-field:user-invalid,
   .text-field[aria-invalid="true"] {
     background: var(--lumo-error-color-10pct);
+  }
+  .text-field:user-invalid:focus {
+    box-shadow: 0 0 0 2px var(--lumo-error-color-50pct);
   }
   .text-field-sm {
     height: var(--lumo-size-s);
@@ -330,40 +335,68 @@ h3 {
     font-size: 0.8125rem;
   }
 
-  /* -------------------------------------------------------------- Checkbox */
+  /* -------------------------------------------------------------- Checkbox
+     Lumo look on a native <input type="checkbox"> (modern-web-guidance `checkbox`): the input stays
+     the interactive target; the check is a masked ::before so it follows currentColor and stays
+     visible in forced-colors mode; focus uses an outline, never removed. */
   .checkbox {
     appearance: none;
     flex: none;
-    position: relative;
-    width: calc(var(--lumo-size-m) / 2);
-    height: calc(var(--lumo-size-m) / 2);
+    display: inline-grid;
+    place-content: center;
+    inline-size: calc(var(--lumo-size-m) / 2);
+    aspect-ratio: 1;
     margin: 0;
     border-radius: var(--lumo-border-radius-s);
     background: var(--lumo-contrast-20pct);
+    color: var(--lumo-primary-contrast-color);
     cursor: pointer;
-    transition: background-color 0.15s, box-shadow 0.15s;
+    transition: background-color 0.15s;
   }
-  .checkbox:hover:not(:checked):not(:disabled) {
-    background: var(--lumo-contrast-30pct);
+  .checkbox::before {
+    content: "";
+    inline-size: 0.75em;
+    aspect-ratio: 1;
+    background-color: currentColor;
+    mask: var(--checkbox-icon, none) no-repeat center / contain;
+    scale: 0;
   }
-  .checkbox:checked,
+  @media (prefers-reduced-motion: no-preference) {
+    .checkbox::before {
+      transition: scale 120ms ease;
+    }
+  }
+  @media (forced-colors: active) {
+    .checkbox {
+      border: 1px solid CanvasText;
+    }
+    .checkbox::before {
+      background-color: CanvasText;
+    }
+  }
+  .checkbox:checked {
+    --checkbox-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'></polyline></svg>");
+  }
   .checkbox:indeterminate {
+    --checkbox-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round'><line x1='5' y1='12' x2='19' y2='12'></line></svg>");
+  }
+  .checkbox:is(:checked, :indeterminate) {
     background: var(--lumo-primary-color);
   }
-  .checkbox:checked::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: center / 75% no-repeat
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  .checkbox:is(:checked, :indeterminate)::before {
+    scale: 1;
+  }
+  .checkbox:hover:not(:checked, :indeterminate, :disabled) {
+    background: var(--lumo-contrast-30pct);
   }
   .checkbox:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 1px var(--lumo-base-color), 0 0 0 3px var(--lumo-primary-color-50pct);
+    outline: 2px solid var(--lumo-primary-color-50pct);
+    outline-offset: 2px;
   }
   .checkbox:disabled {
     background: var(--lumo-contrast-10pct);
-    cursor: default;
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   /* ------------------------------------------------------------------ Grid
@@ -538,6 +571,43 @@ h3 {
     color: var(--lumo-error-text-color);
   }
 
+  /* ---------------------------------------------- Popover panels (anchored)
+     modern-web-guidance `menu` / `viewport-aware-dropdowns`: top layer + implicit anchor from the
+     invoker; position-area instead of JS coordinates; flip when it would overflow. */
+  .popover-panel {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    inset: auto;
+    margin-block: var(--lumo-space-xs);
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .popover-panel {
+      opacity: 0;
+      transition: opacity, display, overlay;
+      transition-duration: 0.12s;
+      transition-behavior: allow-discrete;
+    }
+    .popover-panel:popover-open {
+      opacity: 1;
+      transition-duration: 0.08s;
+      @starting-style {
+        opacity: 0;
+      }
+    }
+  }
+  /* No Popover API: hidden until the fallback script opens it. */
+  @supports not selector(:popover-open) {
+    .popover-panel:not([data-open]) {
+      display: none;
+    }
+    .popover-panel[data-open] {
+      z-index: 50;
+    }
+  }
+
   /* ---------------------------------------------------------------- Dialog */
   .dialog {
     border-radius: var(--lumo-border-radius-l);
@@ -547,6 +617,11 @@ h3 {
   }
   .dialog::backdrop {
     background: var(--lumo-contrast-20pct);
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+  dialog.dialog:modal {
+    overscroll-behavior: contain;
   }
   .dialog-header {
     padding: var(--lumo-space-m) var(--lumo-space-l) 0;

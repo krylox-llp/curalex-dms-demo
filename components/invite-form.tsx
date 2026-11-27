@@ -48,6 +48,7 @@ export function InviteForm({
               </select>
             ) : (
               <input
+                {...(fields.findIndex((x) => x.type !== "select") === fields.indexOf(f) ? { "data-autofocus": "" } : {})}
                 name={f.name}
                 type={f.type}
                 required

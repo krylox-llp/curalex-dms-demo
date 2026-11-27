@@ -49,7 +49,7 @@ function FppForm({
     >
       <label className="field-label">
         Product name
-        <input name="name" required maxLength={200} defaultValue={initial?.name} autoFocus placeholder="Paracetamol 500 mg Tablets" className="text-field" />
+        <input name="name" required maxLength={200} defaultValue={initial?.name} data-autofocus placeholder="Paracetamol 500 mg Tablets" className="text-field" />
       </label>
       <label className="field-label">
         Details <span className="font-normal text-tertiary">(optional)</span>
@@ -120,7 +120,7 @@ export function FppMenu({ fpp }: { fpp: { id: string; name: string; details: str
           onClose={() => setMode(null)}
           footer={
             <>
-              <button type="button" className="btn-tertiary" onClick={() => setMode(null)}>Cancel</button>
+              <button type="button" className="btn-tertiary" onClick={() => setMode(null)} data-autofocus>Cancel</button>
               <button
                 type="button"
                 className="btn-error-primary"
@@ -253,7 +253,7 @@ export function ManufacturerMenu({
           onClose={() => setMode(null)}
           footer={
             <>
-              <button type="button" className="btn-tertiary" onClick={() => setMode(null)}>Cancel</button>
+              <button type="button" className="btn-tertiary" onClick={() => setMode(null)} data-autofocus>Cancel</button>
               <button
                 type="button"
                 className="btn-error-primary"
