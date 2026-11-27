@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 import { DeleteDialog } from "@/components/manufacturer/delete-dialog";
 import { DownloadIcon, FileIcon } from "@/components/manufacturer/icons";
@@ -21,6 +22,7 @@ async function downloadVersion(name: string, version: Version) {
 }
 
 export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId: string | null }) {
+  const router = useRouter();
   const { selection, select, unselect } = useSelection();
   const chosen = selection[doc.id];
   const [localVersionId, setLocalVersionId] = useState(doc.versions[0].id);
@@ -103,8 +105,10 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
                   label: showHistory ? "Hide version history" : `Version history (${doc.versions.length})`,
                   onSelect: () => setShowHistory((s) => !s),
                 },
+                { label: "Audit history", onSelect: () => router.push(`/manufacturer/audit?document=${doc.id}`) },
                 {
                   label: "Delete file",
+                  separatorBefore: true,
                   danger: true,
                   onSelect: () => setDeleting({ target: { kind: "documents", ids: [doc.id] }, label: doc.name }),
                 },

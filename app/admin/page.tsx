@@ -4,6 +4,7 @@ import { inviteCompany } from "@/app/actions";
 import {
   AppShell, AppShellSkeleton, EmptyRow, PageHeader, Section, StatusBadge, dateFormat, tableClasses as t,
 } from "@/components/app-shell";
+import { AdminNav } from "@/components/admin-nav";
 import { InviteForm } from "@/components/invite-form";
 import { ORG_TYPE_LABEL, requireAccount, type OrgType } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
@@ -36,7 +37,7 @@ async function AdminWorkspace() {
   const companies = (data ?? []) as CompanyRow[];
 
   return (
-    <AppShell account={account} area="admin">
+    <AppShell account={account} area="admin" nav={<AdminNav />}>
       <PageHeader title="Companies" description="Manufacturers and exporters on CuraLex. Companies join by invitation only." />
       <Section title="Invite a company" description="The contact signs in with Google using this email to join.">
         <InviteForm

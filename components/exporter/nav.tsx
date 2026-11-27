@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { href: "/exporter", label: "Products", match: (p: string) => p === "/exporter" || p.startsWith("/exporter/fpps") },
   { href: "/exporter/shared", label: "Shared with me", match: (p: string) => p.startsWith("/exporter/shared") },
+  { href: "/exporter/audit", label: "Audit trail", match: (p: string) => p.startsWith("/exporter/audit") },
 ];
 
 export function ExporterNav() {

@@ -2,11 +2,13 @@
 
 import { refresh } from "next/cache";
 import { sendInviteEmail, type EmailStatus } from "@/lib/email/send-invite";
+import { withReason } from "@/lib/audit-reason";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; message: string };
 
 const ERRORS: Record<string, string> = {
+  reason_required: "Enter a reason. It is recorded in the audit trail.",
   invalid_name: "Use a name without slashes (max 100 characters).",
   folder_exists: "A folder with that name already exists here.",
   not_found: "That item no longer exists or isn't yours.",
@@ -95,17 +97,17 @@ export async function shareFiles(input: ShareInput): Promise<ActionResult & { ex
   };
 }
 
-export async function setShareDuration(shareId: string, days: number | null): Promise<ActionResult> {
+export async function setShareDuration(shareId: string, days: number | null, reason?: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("set_share_duration", { p_share: shareId, p_days: days });
+  const { error } = await withReason(supabase.rpc("set_share_duration", { p_share: shareId, p_days: days }), reason);
   if (error) return { ok: false, message: message(error.message) };
   refresh();
   return { ok: true };
 }
 
-export async function revokeShares(shareIds: string[]): Promise<ActionResult> {
+export async function revokeShares(shareIds: string[], reason: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("revoke_shares", { p_share_ids: shareIds });
+  const { data, error } = await withReason(supabase.rpc("revoke_shares", { p_share_ids: shareIds }), reason);
   if (error) return { ok: false, message: message(error.message) };
   refresh();
   return { ok: true, message: `Access revoked for ${data} file${data === 1 ? "" : "s"}.` };
@@ -133,14 +135,14 @@ export async function getDeleteImpact(target: DeleteTarget): Promise<DeleteImpac
 }
 
 /** Deletes in the database (revoking shares), then removes the files from Storage. */
-export async function deleteItems(target: DeleteTarget): Promise<ActionResult> {
+export async function deleteItems(target: DeleteTarget, reason: string): Promise<ActionResult> {
   const supabase = await createClient();
   const { data, error } =
     target.kind === "documents"
-      ? await supabase.rpc("delete_documents", { p_document_ids: target.ids })
+      ? await withReason(supabase.rpc("delete_documents", { p_document_ids: target.ids }), reason)
       : target.kind === "folder"
-        ? await supabase.rpc("delete_folder", { p_folder: target.id })
-        : await supabase.rpc("delete_version", { p_version: target.id });
+        ? await withReason(supabase.rpc("delete_folder", { p_folder: target.id }), reason)
+        : await withReason(supabase.rpc("delete_version", { p_version: target.id }), reason);
   if (error) return { ok: false, message: message(error.message) };
 
   const paths = (data as string[] | null) ?? [];
@@ -160,9 +162,9 @@ export async function deleteItems(target: DeleteTarget): Promise<ActionResult> {
 }
 
 /** Revokes everything shared with the exporter and disconnects them. */
-export async function removeExporter(exporterId: string): Promise<ActionResult> {
+export async function removeExporter(exporterId: string, reason: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("remove_exporter", { p_exporter: exporterId });
+  const { data, error } = await withReason(supabase.rpc("remove_exporter", { p_exporter: exporterId }), reason);
   if (error) return { ok: false, message: message(error.message) };
   refresh();
   return { ok: true, message: `Exporter removed. Access revoked for ${data} file${data === 1 ? "" : "s"}.` };

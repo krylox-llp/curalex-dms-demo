@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { removeExporter } from "@/app/manufacturer/actions";
 import { Dialog } from "@/components/dialog";
 import { RowMenu } from "@/components/manufacturer/row-menu";
+import { ReasonField } from "@/components/reason-field";
 
 /** ⋯ menu with "Remove exporter" and its confirmation. */
 export function ExporterMenu({
@@ -21,11 +22,12 @@ export function ExporterMenu({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
   const [pending, start] = useTransition();
 
   const confirm = () =>
     start(async () => {
-      const res = await removeExporter(exporter.id);
+      const res = await removeExporter(exporter.id, reason);
       if (!res.ok) return setError(res.message);
       setOpen(false);
       if (redirectTo) router.push(redirectTo);
@@ -46,7 +48,7 @@ export function ExporterMenu({
               <button type="button" className="btn-tertiary" onClick={() => setOpen(false)} disabled={pending} data-autofocus>
                 Cancel
               </button>
-              <button type="button" className="btn-error-primary" onClick={confirm} disabled={pending}>
+              <button type="button" className="btn-error-primary" onClick={confirm} disabled={pending || !reason.trim()}>
                 {pending ? "Removing…" : "Remove exporter"}
               </button>
             </>
@@ -63,6 +65,7 @@ export function ExporterMenu({
               </p>
             )}
             <p className="text-secondary">Share history and the access log are kept for audit.</p>
+            <ReasonField value={reason} onChange={setReason} placeholder="e.g. Contract ended" />
             {error && <p role="alert" className="notice notice-error">{error}</p>}
           </div>
         </Dialog>

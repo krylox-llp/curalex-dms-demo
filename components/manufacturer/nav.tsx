@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { href: "/manufacturer", label: "Documents", match: (p: string) => p === "/manufacturer" },
   { href: "/manufacturer/shared", label: "Shared with", match: (p: string) => p.startsWith("/manufacturer/share") },
+  { href: "/manufacturer/audit", label: "Audit trail", match: (p: string) => p.startsWith("/manufacturer/audit") },
 ];
 
 export function ManufacturerNav() {

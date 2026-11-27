@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { revokeShares, setShareDuration } from "@/app/manufacturer/actions";
 import { AccessUntil } from "@/components/access-badge";
+import { Dialog } from "@/components/dialog";
+import { ReasonField } from "@/components/reason-field";
 import { FileIcon } from "@/components/manufacturer/icons";
 import { RowMenu } from "@/components/manufacturer/row-menu";
 import { DURATIONS } from "@/lib/documents-shared";
@@ -40,7 +42,9 @@ const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short
 /** Documents shared with one exporter: change duration or revoke one, selected or all. */
 export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [confirmAll, setConfirmAll] = useState(false);
+  // Shares awaiting a revoke confirmation (one row, the ticked rows, or all).
+  const [revoking, setRevoking] = useState<string[] | null>(null);
+  const [reason, setReason] = useState("");
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -55,11 +59,17 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
     });
   }
 
-  const revoke = (ids: string[]) =>
-    run(() => revokeShares(ids), () => {
+  const askRevoke = (ids: string[]) => {
+    setReason("");
+    setRevoking(ids);
+  };
+  const confirmRevoke = () => {
+    const ids = revoking ?? [];
+    run(() => revokeShares(ids, reason), () => {
       setSelected((prev) => new Set([...prev].filter((id) => !ids.includes(id))));
-      setConfirmAll(false);
+      setRevoking(null);
     });
+  };
 
   return (
     <div>
@@ -73,7 +83,7 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
           <div className="flex items-center gap-2">
             <span className="text-sm text-secondary">{selectedIds.length} selected</span>
             <button type="button" className="btn-tertiary btn-sm" onClick={() => setSelected(new Set())}>Clear</button>
-            <button type="button" className="btn-error btn-sm" disabled={pending} onClick={() => revoke(selectedIds)}>
+            <button type="button" className="btn-error btn-sm" disabled={pending} onClick={() => askRevoke(selectedIds)}>
               Revoke access
             </button>
           </div>
@@ -82,25 +92,35 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
             <div className="flex items-center gap-1">
               <RowMenu
                 label="More actions"
-                items={[{ label: `Revoke all (${rows.length})`, danger: true, onSelect: () => setConfirmAll(true) }]}
+                items={[{ label: `Revoke all (${rows.length})`, danger: true, onSelect: () => askRevoke(rows.map((r) => r.id)) }]}
               />
             </div>
           )
         )}
       </div>
 
-      {confirmAll && (
-        <div className="notice notice-error mb-3 items-center justify-between">
-          <span>
-            Revoke access to all {rows.length} file{rows.length === 1 ? "" : "s"} listed? Exporters lose access immediately.
-          </span>
-          <span className="flex shrink-0 gap-2">
-            <button type="button" className="btn-tertiary btn-sm" onClick={() => setConfirmAll(false)}>Cancel</button>
-            <button type="button" className="btn-error-primary btn-sm" disabled={pending} onClick={() => revoke(rows.map((r) => r.id))}>
-              Revoke all
-            </button>
-          </span>
-        </div>
+      {revoking && (
+        <Dialog
+          title="Revoke access?"
+          onClose={() => setRevoking(null)}
+          footer={
+            <>
+              <button type="button" className="btn-tertiary" onClick={() => setRevoking(null)} disabled={pending} data-autofocus>
+                Cancel
+              </button>
+              <button type="button" className="btn-error-primary" onClick={confirmRevoke} disabled={pending || !reason.trim()}>
+                {pending ? "Revoking…" : "Revoke access"}
+              </button>
+            </>
+          }
+        >
+          <p className="text-body">
+            {revoking.length === 1
+              ? `The exporter will lose access to “${rows.find((r) => r.id === revoking[0])?.fileName ?? "this file"}” immediately.`
+              : `The exporter will lose access to ${revoking.length} files immediately.`}
+          </p>
+          <ReasonField value={reason} onChange={setReason} placeholder="e.g. Superseded by a new version" />
+        </Dialog>
       )}
       {notice && (
         <p role="status" className={`notice mb-3 ${notice.ok ? "notice-success" : "notice-error"}`}>{notice.text}</p>
@@ -174,7 +194,7 @@ export function SharesTable({ rows, now }: { rows: ShareRow[]; now: number }) {
                         label: d.label,
                         onSelect: () => run(() => setShareDuration(r.id, d.days)),
                       })),
-                      { label: "Revoke access", danger: true, separatorBefore: true, onSelect: () => revoke([r.id]) },
+                      { label: "Revoke access", danger: true, separatorBefore: true, onSelect: () => askRevoke([r.id]) },
                     ]}
                   />
                 </td>

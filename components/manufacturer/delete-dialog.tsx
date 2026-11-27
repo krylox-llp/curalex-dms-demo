@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { deleteItems, getDeleteImpact, type DeleteImpact, type DeleteTarget } from "@/app/manufacturer/actions";
 import { Dialog } from "@/components/dialog";
+import { ReasonField } from "@/components/reason-field";
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
@@ -40,6 +41,7 @@ export function DeleteDialog({
 }) {
   const [impact, setImpact] = useState<DeleteImpact | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export function DeleteDialog({
 
   function confirm() {
     startTransition(async () => {
-      const res = await deleteItems(target);
+      const res = await deleteItems(target, reason);
       if (!res.ok) return setError(res.message);
       onDeleted?.();
       onClose();
@@ -72,7 +74,7 @@ export function DeleteDialog({
           <button type="button" onClick={onClose} disabled={pending} className="btn-tertiary" data-autofocus>
             Cancel
           </button>
-          <button type="button" onClick={confirm} disabled={pending || !impact} className="btn-error-primary">
+          <button type="button" onClick={confirm} disabled={pending || !impact || !reason.trim()} className="btn-error-primary">
             {pending ? "Deleting…" : "Delete"}
           </button>
         </>
@@ -94,6 +96,7 @@ export function DeleteDialog({
           <p className="text-secondary">The files are removed from storage. This can&apos;t be undone.</p>
         </div>
       )}
+      {impact && <ReasonField value={reason} onChange={setReason} placeholder="e.g. Uploaded in error" />}
       {error && <p role="alert" className="notice notice-error mt-3">{error}</p>}
     </Dialog>
   );

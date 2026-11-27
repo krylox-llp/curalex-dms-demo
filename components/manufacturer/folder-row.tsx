@@ -15,7 +15,7 @@ export function FolderRow({ folder }: { folder: Folder }) {
       <td colSpan={4}>
         <Link href={`/manufacturer?folder=${folder.id}`} className="flex items-center gap-2.5 font-medium text-header hover:text-primary-text">
           <FolderIcon className="size-4 shrink-0 text-primary" />
-          {folder.name}
+          {folder.name}/
         </Link>
       </td>
       <td className="text-right">
