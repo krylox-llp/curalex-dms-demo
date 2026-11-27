@@ -1,11 +1,12 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { sendInviteEmail, type EmailStatus } from "@/lib/email/send-invite";
 import { createClient } from "@/lib/supabase/server";
 
 export type InviteResult =
-  | { ok: true; kind: "invited"; email: string; loginPath: string }
-  | { ok: true; kind: "linked"; orgName: string }
+  | { ok: true; kind: "invited"; email: string; loginPath: string; emailStatus: EmailStatus }
+  | { ok: true; kind: "linked"; orgName: string; email: string; emailStatus: EmailStatus }
   | { ok: false; message: string; values: Record<string, string> };
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -47,7 +48,9 @@ export async function inviteCompany(_prev: InviteResult | null, formData: FormDa
   if (error) return { ok: false, message: errorMessage(error.message), values };
 
   refresh();
-  return { ok: true, kind: "invited", email: (data as { email: string }).email, loginPath: `/login/${values.type}` };
+  const email = (data as { email: string }).email;
+  const emailStatus = await sendInviteEmail({ kind: "invited", role: values.type, companyName: values.company, email });
+  return { ok: true, kind: "invited", email, loginPath: `/login/${values.type}`, emailStatus };
 }
 
 /** Manufacturer invites an exporter they work with. */
@@ -63,7 +66,13 @@ export async function inviteExporter(_prev: InviteResult | null, formData: FormD
 
   refresh();
   const result = data as { status: "invited" | "linked_existing"; email: string; org_name: string };
+  const emailStatus = await sendInviteEmail({
+    kind: result.status === "invited" ? "invited" : "added",
+    role: "exporter",
+    companyName: result.org_name,
+    email: result.email,
+  });
   return result.status === "invited"
-    ? { ok: true, kind: "invited", email: result.email, loginPath: "/login/exporter" }
-    : { ok: true, kind: "linked", orgName: result.org_name };
+    ? { ok: true, kind: "invited", email: result.email, loginPath: "/login/exporter", emailStatus }
+    : { ok: true, kind: "linked", orgName: result.org_name, email: result.email, emailStatus };
 }

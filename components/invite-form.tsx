@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import type { InviteResult } from "@/app/actions";
+import type { EmailStatus } from "@/lib/email/send-invite";
 
 type Field =
   | { name: string; label: string; type: "text" | "email"; placeholder?: string }
@@ -73,26 +74,38 @@ export function InviteForm({
         </p>
       )}
       {state?.ok && state.kind === "linked" && (
-        <p role="status" className="notice notice-success mt-3">
-          {state.orgName} is already on CuraLex and has been added to your exporters.
+        <p role="status" className={`notice mt-3 ${state.emailStatus.sent ? "notice-success" : "notice-warning"}`}>
+          {state.orgName} is already on CuraLex and has been added to your exporters.{" "}
+          {state.emailStatus.sent
+            ? `We've emailed ${state.email} to let them know.`
+            : `The notification email couldn't be sent (${state.emailStatus.error}).`}
         </p>
       )}
-      {state?.ok && state.kind === "invited" && <InvitedNotice email={state.email} loginPath={state.loginPath} />}
+      {state?.ok && state.kind === "invited" && (
+        <InvitedNotice email={state.email} loginPath={state.loginPath} emailStatus={state.emailStatus} />
+      )}
     </div>
   );
 }
 
-function InvitedNotice({ email, loginPath }: { email: string; loginPath: string }) {
+function InvitedNotice({ email, loginPath, emailStatus }: { email: string; loginPath: string; emailStatus: EmailStatus }) {
   const [copied, setCopied] = useState(false);
   // Only rendered after a client-side submit, so `window` is always available.
   const loginUrl = typeof window === "undefined" ? loginPath : `${window.location.origin}${loginPath}`;
 
   return (
-    <div role="status" className="notice notice-success mt-3 flex-col">
-      <p>
-        Invitation created for <strong>{email}</strong>. Send them this link and ask them to sign in
-        with Google using that email:
-      </p>
+    <div role="status" className={`notice mt-3 flex-col ${emailStatus.sent ? "notice-success" : "notice-warning"}`}>
+      {emailStatus.sent ? (
+        <p>
+          Invitation emailed to <strong>{email}</strong>. They sign in with Google using that address. You can also
+          share the link yourself:
+        </p>
+      ) : (
+        <p>
+          Invitation created for <strong>{email}</strong>, but the email couldn&apos;t be sent ({emailStatus.error}).
+          Send them this link and ask them to sign in with Google using that email:
+        </p>
+      )}
       <div className="mt-2 flex items-center gap-2">
         <code className="min-w-0 flex-1 truncate rounded-lumo-s bg-base px-2 py-1.5 text-xs text-body">{loginUrl}</code>
         <button

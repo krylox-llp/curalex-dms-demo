@@ -1,6 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { sendInviteEmail, type EmailStatus } from "@/lib/email/send-invite";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; message: string };
@@ -41,6 +42,8 @@ export async function shareFiles(input: ShareInput): Promise<ActionResult & { ex
   const supabase = await createClient();
 
   let exporterId: string;
+  // When a new exporter is invited from the share page, email them after the share succeeds.
+  let notify: { kind: "invited" | "added"; company: string; email: string } | null = null;
   if (input.recipient.kind === "existing") {
     exporterId = input.recipient.exporterId;
   } else {
@@ -48,7 +51,13 @@ export async function shareFiles(input: ShareInput): Promise<ActionResult & { ex
     const { data, error } = await supabase.rpc("invite_exporter", { p_company: company, p_email: email });
     if (error && !error.message.includes("already_linked")) return { ok: false, message: message(error.message) };
     if (data) {
-      exporterId = (data as { org_id: string }).org_id;
+      const invited = data as { org_id: string; status: "invited" | "linked_existing"; org_name: string; email: string };
+      exporterId = invited.org_id;
+      notify = {
+        kind: invited.status === "invited" ? "invited" : "added",
+        company: invited.org_name,
+        email: invited.email,
+      };
     } else {
       // Already in this manufacturer's list: find it by POC email.
       const { data: list } = await supabase.rpc("my_exporters");
@@ -67,7 +76,23 @@ export async function shareFiles(input: ShareInput): Promise<ActionResult & { ex
   if (error) return { ok: false, message: message(error.message) };
 
   refresh();
-  return { ok: true, exporterId, message: `${data} file${data === 1 ? "" : "s"} shared.` };
+  const shared = `${data} file${data === 1 ? "" : "s"} shared.`;
+  if (!notify) return { ok: true, exporterId, message: shared };
+
+  const status: EmailStatus = await sendInviteEmail({
+    kind: notify.kind,
+    role: "exporter",
+    companyName: notify.company,
+    email: notify.email,
+    extra: `${data} document${data === 1 ? " has" : "s have"} been shared with you and will be waiting when you sign in.`,
+  });
+  return {
+    ok: true,
+    exporterId,
+    message: status.sent
+      ? `${shared} Invitation emailed to ${notify.email}.`
+      : `${shared} The invitation email couldn't be sent (${status.error}); share the exporter sign-in link with them.`,
+  };
 }
 
 export async function setShareDuration(shareId: string, days: number | null): Promise<ActionResult> {
