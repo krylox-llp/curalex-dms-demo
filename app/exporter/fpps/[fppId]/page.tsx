@@ -10,7 +10,7 @@ import { requireAccount } from "@/lib/account";
 import { isUuid } from "@/lib/documents-shared";
 import { getFpp, getManufacturerOptions, getSharedDocuments, roleLabel } from "@/lib/exporter/data";
 
-export const metadata: Metadata = { title: "FPP · CuraLex - DMS" };
+export const metadata: Metadata = { title: "Product · CuraLex - DMS" };
 
 export default function FppPage(props: PageProps<"/exporter/fpps/[fppId]">) {
   return (
@@ -33,7 +33,7 @@ async function FppDetail({ params }: PageProps<"/exporter/fpps/[fppId]">) {
       <PageHeader
         title={fpp.name}
         description={fpp.details ?? undefined}
-        breadcrumb={<Breadcrumbs items={[{ label: "FPPs", href: "/exporter" }, { label: fpp.name }]} />}
+        breadcrumb={<Breadcrumbs items={[{ label: "Products", href: "/exporter" }, { label: fpp.name }]} />}
         actions={
           <>
             <AddManufacturerButton fppId={fpp.id} options={addable} />

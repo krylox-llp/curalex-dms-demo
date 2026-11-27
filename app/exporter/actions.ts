@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 export type Result = { ok: true; id?: string; message?: string } | { ok: false; message: string };
 
 const ERRORS: Record<string, string> = {
-  invalid_name: "Enter a name for the FPP.",
-  fpp_exists: "You already have an FPP with that name.",
+  invalid_name: "Enter a name for the product.",
+  fpp_exists: "You already have a product with that name.",
   not_found: "That item no longer exists or isn't available to you.",
   not_allowed: "You don't have permission to do that.",
   not_your_manufacturer: "That manufacturer hasn't added you yet.",

@@ -25,7 +25,7 @@ function useAction() {
 const ErrorNote = ({ error }: { error: string | null }) =>
   error ? <p role="alert" className="notice notice-error mt-4">{error}</p> : null;
 
-/* ---------------------------------------------------------------- FPP create / edit */
+/* ------------------------------------------------------------ Product create / edit */
 
 function FppForm({
   initial,
@@ -48,7 +48,7 @@ function FppForm({
       className="flex flex-col gap-4"
     >
       <label className="field-label">
-        FPP name
+        Product name
         <input name="name" required maxLength={200} defaultValue={initial?.name} autoFocus placeholder="Paracetamol 500 mg Tablets" className="text-field" />
       </label>
       <label className="field-label">
@@ -70,14 +70,14 @@ export function NewFppButton() {
   const { error, pending, run } = useAction();
   return (
     <>
-      <button type="button" className="btn-primary" onClick={() => setOpen(true)}>New FPP</button>
+      <button type="button" className="btn-primary" onClick={() => setOpen(true)}>New product</button>
       {open && (
-        <Dialog title="New FPP" onClose={() => setOpen(false)}>
+        <Dialog title="New product" onClose={() => setOpen(false)}>
           <p className="mb-4 text-secondary">
-            Create a finished pharmaceutical product, then add the manufacturers behind it and their documents.
+            Create a finished pharmaceutical product (FPP), then add the manufacturers behind it and their documents.
           </p>
           <FppForm
-            submitLabel="Create FPP"
+            submitLabel="Create product"
             pending={pending}
             error={error}
             onClose={() => setOpen(false)}
@@ -99,11 +99,11 @@ export function FppMenu({ fpp }: { fpp: { id: string; name: string; details: str
         label={`Actions for ${fpp.name}`}
         items={[
           { label: "Edit details", onSelect: () => setMode("edit") },
-          { label: "Delete FPP", danger: true, separatorBefore: true, onSelect: () => setMode("delete") },
+          { label: "Delete product", danger: true, separatorBefore: true, onSelect: () => setMode("delete") },
         ]}
       />
       {mode === "edit" && (
-        <Dialog title="Edit FPP" onClose={() => setMode(null)}>
+        <Dialog title="Edit product" onClose={() => setMode(null)}>
           <FppForm
             initial={fpp}
             submitLabel="Save"
@@ -116,7 +116,7 @@ export function FppMenu({ fpp }: { fpp: { id: string; name: string; details: str
       )}
       {mode === "delete" && (
         <Dialog
-          title="Delete FPP?"
+          title="Delete product?"
           onClose={() => setMode(null)}
           footer={
             <>
@@ -127,13 +127,13 @@ export function FppMenu({ fpp }: { fpp: { id: string; name: string; details: str
                 disabled={pending}
                 onClick={() => run(() => deleteFpp(fpp.id), () => router.push("/exporter"))}
               >
-                {pending ? "Deleting…" : "Delete FPP"}
+                {pending ? "Deleting…" : "Delete product"}
               </button>
             </>
           }
         >
           <p className="text-body">
-            This removes the FPP “{fpp.name}” and its grouping. The documents stay available under Shared with me.
+            This removes the product “{fpp.name}” and its grouping. The documents stay available under Shared with me.
           </p>
           <ErrorNote error={error} />
         </Dialog>
@@ -142,7 +142,7 @@ export function FppMenu({ fpp }: { fpp: { id: string; name: string; details: str
   );
 }
 
-/* ------------------------------------------------------------- Manufacturers in FPP */
+/* --------------------------------------------------------- Manufacturers in product */
 
 function RoleSelect({ defaultValue }: { defaultValue?: FppRole | null }) {
   return (
@@ -178,7 +178,7 @@ export function AddManufacturerButton({
         <Dialog title="Add manufacturer" onClose={() => setOpen(false)}>
           {options.length === 0 ? (
             <p className="text-secondary">
-              All manufacturers who have added you are already in this FPP. Manufacturers appear here once they invite you.
+              All manufacturers who have added you are already in this product. Manufacturers appear here once they invite you.
             </p>
           ) : (
             <form
@@ -227,7 +227,7 @@ export function ManufacturerMenu({
         label={`Actions for ${manufacturer.name}`}
         items={[
           { label: "Change role", onSelect: () => setMode("role") },
-          { label: "Remove from FPP", danger: true, separatorBefore: true, onSelect: () => setMode("remove") },
+          { label: "Remove from product", danger: true, separatorBefore: true, onSelect: () => setMode("remove") },
         ]}
       />
       {mode === "role" && (
@@ -268,8 +268,8 @@ export function ManufacturerMenu({
           <p className="text-body">
             {manufacturer.name}
             {manufacturer.docCount > 0
-              ? ` and its ${manufacturer.docCount} document${manufacturer.docCount === 1 ? "" : "s"} will be removed from this FPP.`
-              : " will be removed from this FPP."}{" "}
+              ? ` and its ${manufacturer.docCount} document${manufacturer.docCount === 1 ? "" : "s"} will be removed from this product.`
+              : " will be removed from this product."}{" "}
             The documents stay available under Shared with me.
           </p>
           <ErrorNote error={error} />
@@ -288,7 +288,7 @@ export function AddDocumentsButton({
 }: {
   fppId: string;
   manufacturerName: string;
-  /** This manufacturer's shared documents not yet in the FPP (live ones only). */
+  /** This manufacturer's shared documents not yet in the product (live ones only). */
   available: SharedDoc[];
 }) {
   const [open, setOpen] = useState(false);
@@ -322,7 +322,7 @@ export function AddDocumentsButton({
         >
           {available.length === 0 ? (
             <p className="text-secondary">
-              Nothing more to add. Every document {manufacturerName} has shared with you is already in this FPP.
+              Nothing more to add. Every document {manufacturerName} has shared with you is already in this product.
             </p>
           ) : (
             <div className="data-grid data-grid-compact">

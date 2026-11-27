@@ -7,7 +7,7 @@ import { ExporterNav } from "@/components/exporter/nav";
 import { requireAccount } from "@/lib/account";
 import { getFpps, getManufacturerOptions, getSharedDocuments, isExpiringSoon } from "@/lib/exporter/data";
 
-export const metadata: Metadata = { title: "FPPs · CuraLex - DMS" };
+export const metadata: Metadata = { title: "Products · CuraLex - DMS" };
 
 export default function FppsPage() {
   return (
@@ -24,15 +24,15 @@ async function Fpps() {
   return (
     <AppShell account={account} area="company" nav={<ExporterNav />}>
       <PageHeader
-        title="FPPs"
-        description="Each finished pharmaceutical product with the manufacturers behind it and their documents in one place."
+        title="Products"
+        description="Each finished pharmaceutical product (FPP) with the manufacturers behind it and their documents in one place."
         actions={<NewFppButton />}
       />
       <div className="data-grid">
         <table>
           <thead>
             <tr>
-              <th>FPP</th>
+              <th>Product</th>
               <th>Manufacturers</th>
               <th>Documents</th>
               <th>Needs attention</th>
@@ -43,7 +43,7 @@ async function Fpps() {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="py-14 text-center text-secondary">
-                  No FPPs yet. Create one to group documents from its manufacturers.
+                  No products yet. Create one to group documents from its manufacturers.
                 </td>
               </tr>
             )}

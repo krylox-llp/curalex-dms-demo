@@ -22,7 +22,7 @@ export function DocsTable({
 }: {
   docs: SharedDoc[];
   now: number;
-  /** When shown inside an FPP, rows get "Remove from FPP". */
+  /** When shown inside a product, rows get "Remove from product". */
   fppId?: string;
   emptyText: string;
   showManufacturer?: boolean;
@@ -91,7 +91,7 @@ export function DocsTable({
                       label={`Actions for ${d.file_name}`}
                       items={[
                         {
-                          label: "Remove from FPP",
+                          label: "Remove from product",
                           danger: true,
                           onSelect: () => start(async () => void (await removeFppDocument(fppId, d.share_id))),
                         },
