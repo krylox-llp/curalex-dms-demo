@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { AuditView } from "@/components/audit-view";
-import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { requireAccount, requirePermission } from "@/lib/account";
 import { parseFilters } from "@/lib/audit";
 
@@ -21,7 +20,7 @@ async function Audit({ searchParams }: Pick<PageProps<"/manufacturer/audit">, "s
   requirePermission(account, "audit.view", "/manufacturer");
   const filters = parseFilters(await searchParams);
   return (
-    <AppShell account={account} area="company" nav={<ManufacturerNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title="Audit trail"
         description="A tamper-evident record of who did what and when. Entries can't be edited or deleted."

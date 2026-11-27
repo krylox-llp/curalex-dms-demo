@@ -12,6 +12,12 @@ export type SharedDoc = {
   shared_at: string;
   expires_at: string | null;
   expired: boolean;
+  /** Set by the manufacturer on the document. */
+  doc_type: string | null;
+  product: string | null;
+  document_expiry: string | null; // YYYY-MM-DD
+  /** Latest version of the document at the manufacturer (may be newer than the shared one). */
+  latest_version: number | null;
 };
 
 export type FppRole = "finished_product" | "api" | "excipient" | "packaging" | "other";

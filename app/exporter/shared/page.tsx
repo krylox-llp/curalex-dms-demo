@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader, dateFormat } from "@/components/app-shell";
-import { ExporterNav } from "@/components/exporter/nav";
 import { requireAccount } from "@/lib/account";
 import { getManufacturerOptions, getSharedDocuments, isExpiringSoon } from "@/lib/exporter/data";
 
@@ -21,7 +20,7 @@ async function SharedWithMe() {
   const rows = await loadManufacturers();
 
   return (
-    <AppShell account={account} area="company" nav={<ExporterNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title="Shared with me"
         description="Manufacturers who have added you and the documents they share. Access is set by each manufacturer."

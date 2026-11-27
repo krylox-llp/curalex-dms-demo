@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppShell, AppShellSkeleton } from "@/components/app-shell";
 import { TeamPage } from "@/components/team-page";
-import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { requireAccount, requirePermission } from "@/lib/account";
 
 export const metadata: Metadata = { title: "Team · CuraLex - DMS" };
@@ -19,7 +18,7 @@ async function Team() {
   const account = await requireAccount("manufacturer");
   requirePermission(account, "users.manage", "/manufacturer");
   return (
-    <AppShell account={account} area="company" nav={<ManufacturerNav />}>
+    <AppShell account={account} area="company">
       <TeamPage type="manufacturer" />
     </AppShell>
   );

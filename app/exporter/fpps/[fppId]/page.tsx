@@ -5,7 +5,6 @@ import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocsTable } from "@/components/exporter/docs-table";
 import { AddDocumentsButton, AddManufacturerButton, FppMenu, ManufacturerMenu } from "@/components/exporter/fpp-controls";
-import { ExporterNav } from "@/components/exporter/nav";
 import { can, requireAccount } from "@/lib/account";
 import { isUuid } from "@/lib/documents-shared";
 import { getFpp, getManufacturerOptions, getSharedDocuments, roleLabel } from "@/lib/exporter/data";
@@ -29,11 +28,11 @@ async function FppDetail({ params }: PageProps<"/exporter/fpps/[fppId]">) {
   const { fpp, sections, addable, now } = data;
 
   return (
-    <AppShell account={account} area="company" nav={<ExporterNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title={fpp.name}
         description={fpp.details ?? undefined}
-        breadcrumb={<Breadcrumbs items={[{ label: "Products", href: "/exporter" }, { label: fpp.name }]} />}
+        breadcrumb={<Breadcrumbs items={[{ label: "Products", href: "/exporter/products" }, { label: fpp.name }]} />}
         actions={
           can(account, "products.edit") ? (
             <>

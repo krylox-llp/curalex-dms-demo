@@ -8,14 +8,14 @@ import { RowMenu } from "@/components/manufacturer/row-menu";
 import { useCan } from "@/components/permissions";
 import type { Folder } from "@/lib/documents-shared";
 
-export function FolderRow({ folder }: { folder: Folder }) {
+export function FolderRow({ folder, compact = false }: { folder: Folder; compact?: boolean }) {
   const [deleting, setDeleting] = useState(false);
   const canDelete = useCan("documents.delete");
   return (
     <tr className="hover:bg-contrast-5">
       <td />
-      <td colSpan={4}>
-        <Link href={`/manufacturer?folder=${folder.id}`} className="flex items-center gap-2.5 font-medium text-header hover:text-primary-text">
+      <td colSpan={compact ? 4 : 6}>
+        <Link href={`/manufacturer/documents?folder=${folder.id}`} className="flex items-center gap-2.5 font-medium text-header hover:text-primary-text">
           <FolderIcon className="size-4 shrink-0 text-primary" />
           {folder.name}/
         </Link>

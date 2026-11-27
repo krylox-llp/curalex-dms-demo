@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocsTable } from "@/components/exporter/docs-table";
-import { ExporterNav } from "@/components/exporter/nav";
 import { requireAccount } from "@/lib/account";
 import { isUuid } from "@/lib/documents-shared";
 import { getManufacturerOptions, getSharedDocuments } from "@/lib/exporter/data";
@@ -27,7 +26,7 @@ async function ManufacturerDocs({ params }: PageProps<"/exporter/shared/[manufac
   if (!data) notFound();
 
   return (
-    <AppShell account={account} area="company" nav={<ExporterNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title={data.name}
         description="Documents this manufacturer has shared with you. Every view and download is recorded and visible to the manufacturer."

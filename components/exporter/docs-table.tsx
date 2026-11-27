@@ -6,6 +6,7 @@ import { AccessUntil } from "@/components/access-badge";
 import { DownloadIcon, FileIcon } from "@/components/manufacturer/icons";
 import { RowMenu } from "@/components/manufacturer/row-menu";
 import { useCan } from "@/components/permissions";
+import { docType, expiryBadge, formatDate } from "@/lib/documents-shared";
 import type { SharedDoc } from "@/lib/exporter/shared";
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -31,7 +32,8 @@ export function DocsTable({
   const [pending, start] = useTransition();
   const canDownload = useCan("documents.download");
   const canEdit = useCan("products.edit");
-  const cols = showManufacturer ? 6 : 5;
+  const cols = showManufacturer ? 8 : 7;
+  const today = new Date(now).toISOString().slice(0, 10);
   return (
     <div className="data-grid">
       <table>
@@ -39,7 +41,9 @@ export function DocsTable({
           <tr>
             <th>Document</th>
             {showManufacturer && <th>Manufacturer</th>}
+            <th>Type</th>
             <th>Version</th>
+            <th>Expiry</th>
             <th>Shared</th>
             <th>Access until</th>
             <th className="w-px"><span className="sr-only">Actions</span></th>
@@ -53,7 +57,7 @@ export function DocsTable({
           )}
           {docs.map((d) => (
             <tr key={d.share_id}>
-              <td className="max-w-0 w-[42%]">
+              <td className="max-w-0 w-[34%]">
                 <span className="flex items-center gap-2.5">
                   <FileIcon className="size-4 shrink-0 text-tertiary" />
                   <span className="min-w-0">
@@ -67,7 +71,26 @@ export function DocsTable({
               {showManufacturer && (
                 <td className="max-w-0 w-[20%]"><span className="block truncate" title={d.manufacturer_name}>{d.manufacturer_name}</span></td>
               )}
-              <td className="text-secondary">v{d.version}</td>
+              <td>{docType(d.doc_type) ? <span className="doc-type" title={docType(d.doc_type)!.label}>{docType(d.doc_type)!.short}</span> : <span className="text-tertiary">—</span>}</td>
+              <td className="whitespace-nowrap text-secondary">
+                v{d.version}
+                {d.latest_version !== null && d.latest_version > d.version && (
+                  <span className="badge badge-sm badge-warning ml-2" title={`The manufacturer has version ${d.latest_version}`}>Superseded by v{d.latest_version}</span>
+                )}
+              </td>
+              <td className="whitespace-nowrap">
+                {d.document_expiry ? (
+                  <span className="inline-flex items-center gap-2">
+                    {formatDate(d.document_expiry)}
+                    {(() => {
+                      const b = expiryBadge(d.document_expiry, today);
+                      return b && <span className={`badge badge-sm badge-${b.tone}`}>{b.label}</span>;
+                    })()}
+                  </span>
+                ) : (
+                  <span className="text-tertiary">—</span>
+                )}
+              </td>
               <td className="whitespace-nowrap text-secondary">{dateFmt.format(new Date(d.shared_at))}</td>
               <td><AccessUntil expiresAt={d.expires_at} now={now} /></td>
               <td className="whitespace-nowrap text-right">

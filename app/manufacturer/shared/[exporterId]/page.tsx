@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader, StatusBadge } from "@/components/app-shell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { ExporterMenu } from "@/components/manufacturer/remove-exporter";
 import { SharesTable, type ShareRow } from "@/components/manufacturer/shares-table";
 import { can, requireAccount } from "@/lib/account";
@@ -33,7 +32,7 @@ async function ExporterShares({ params, searchParams }: PageProps<"/manufacturer
   const justShared = typeof shared === "string" ? Number(shared) : 0;
 
   return (
-    <AppShell account={account} area="company" nav={<ManufacturerNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title={exporter.name}
         description={
@@ -45,7 +44,7 @@ async function ExporterShares({ params, searchParams }: PageProps<"/manufacturer
         breadcrumb={<Breadcrumbs items={[{ label: "Shared with", href: "/manufacturer/shared" }, { label: exporter.name }]} />}
         actions={
           <>
-            {can(account, "sharing.share") && <Link href={`/manufacturer?to=${exporter.org_id}`} className="btn-primary">Share files</Link>}
+            {can(account, "sharing.share") && <Link href={`/manufacturer/documents?to=${exporter.org_id}`} className="btn-primary">Share files</Link>}
             {can(account, "exporters.remove") && <ExporterMenu
               exporter={{ id: exporter.org_id, name: exporter.name }}
               liveFiles={rows.filter((r) => !r.expiresAt || new Date(r.expiresAt).getTime() > now).length}

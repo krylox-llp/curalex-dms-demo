@@ -10,12 +10,20 @@ const openPopovers = "[...document.querySelectorAll('[popover]')].filter(p => p.
 await withBrowser(BASE, async (b) => {
   // Manufacturer
   await b.as("manufacturer");
-  check("manufacturer lands on Documents", (await b.go("/")) === "/manufacturer");
-  check("manufacturer tabs", (await b.eval(`${visible(".tab").replace("[0]", "")}.map(t => t.textContent).join('|')`)) === "Documents|Shared with");
+  check("manufacturer lands on Overview", (await b.go("/")) === "/manufacturer");
+  const sidebar = await b.eval(`[...document.querySelectorAll('nav[aria-label="Workspace"] a')].filter(a => a.offsetParent !== null).map(a => a.textContent.replace(/\\d+$/, '').trim()).join('|')`);
+  check("sidebar links", sidebar === "Overview|Documents|Shared with|Audit trail|Team", sidebar);
+  check("overview flags the CoPP expiring in 12 days", (await b.eval("document.body.innerText")).includes("CoPP - Kenya.pdf expires"));
+  await b.go("/manufacturer/documents");
   check("three files listed", (await b.eval(`${rowsText}.length`)) === 3);
-  await b.click(`document.querySelector('[aria-label="Account"][aria-expanded]')`);
-  check("profile menu has Audit trail and Team", (await b.eval(`[...document.querySelectorAll('nav[aria-label="Account pages"] a')].map(a => a.textContent).join(',')`)) === "Audit trail,Team");
-  await b.key("Escape");
+  check("type and expiry shown", (await b.eval(`${rowsText}.join(' ')`)).includes("CoPP") && /\b1[12] days\b/.test(await b.eval(`${rowsText}.join(' ')`)));
+  await b.click(visible("a", "CoPP - Kenya"));
+  await b.sleep(1200);
+  check("details panel opens", (await b.eval(`document.querySelector('aside[aria-label^="Details of"] h2')?.textContent`)) === "CoPP - Kenya.pdf");
+  await b.go("/manufacturer/documents?expiry=30");
+  check("expiry filter finds 1 document", (await b.eval(`${rowsText}.length`)) === 1);
+  await b.go("/manufacturer/search?q=paracetamol");
+  check("search finds documents", (await b.eval("document.body.innerText")).includes("CoA - Paracetamol 500mg Tablets.pdf"));
 
   await b.go("/manufacturer/shared");
   check("exporter listed under Shared with", (await b.eval(`${rowsText}.join(' ')`)).includes("Tarangini Pharma Exports LLP"));
@@ -40,8 +48,8 @@ await withBrowser(BASE, async (b) => {
 
   // Exporter
   await b.as("exporter");
-  check("exporter lands on Products", (await b.go("/")) === "/exporter");
-  check("product listed", (await b.eval(`${rowsText}.join(' ')`)).includes("Paracetamol 500 mg Tablets"));
+  check("exporter lands on Overview", (await b.go("/")) === "/exporter");
+  check("product readiness lists the product", (await b.eval(`${rowsText}.join(' ')`)).includes("Paracetamol 500 mg Tablets"));
   await b.click(visible("a", "Paracetamol"));
   await b.sleep(1500);
   check("product shows both manufacturers", (await b.eval(`[...document.querySelectorAll('section h2')].filter(h => h.offsetParent !== null).length`)) === 2);

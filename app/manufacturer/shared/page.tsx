@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader, StatusBadge, dateFormat } from "@/components/app-shell";
 import { InviteExporterButton } from "@/components/manufacturer/invite-exporter-dialog";
-import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { ExporterMenu } from "@/components/manufacturer/remove-exporter";
 import { can, requireAccount } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
@@ -36,7 +35,7 @@ async function SharedWith() {
   const exporters = await loadExporters(account.org.id);
 
   return (
-    <AppShell account={account} area="company" nav={<ManufacturerNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title="Shared with"
         description="Exporters you work with and the documents they can access. Only exporters you invite can receive documents."

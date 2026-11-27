@@ -40,7 +40,16 @@ async function uploadOne(file: File, folderId: string | null, asName?: string) {
  * Uploads files into a folder. A file whose name already exists becomes its next version.
  * With `asName`, uploads a single file as a new version of that document.
  */
-export function UploadButton({ folderId, asName }: { folderId: string | null; asName?: string }) {
+export function UploadButton({
+  folderId,
+  asName,
+  label,
+}: {
+  folderId: string | null;
+  asName?: string;
+  /** With `asName`: show a labelled secondary button instead of the icon button. */
+  label?: string;
+}) {
   const input = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [statuses, setStatuses] = useState<Status[]>([]);
@@ -69,7 +78,7 @@ export function UploadButton({ folderId, asName }: { folderId: string | null; as
   }
 
   return (
-    <div className={asName ? "relative inline-block" : "relative"}>
+    <div className={asName ? `relative ${label ? "flex flex-1" : "inline-block"}` : "relative"}>
       <input
         ref={input}
         type="file"
@@ -79,7 +88,11 @@ export function UploadButton({ folderId, asName }: { folderId: string | null; as
         aria-hidden="true"
         onChange={(e) => handle(e.target.files)}
       />
-      {asName ? (
+      {asName && label ? (
+        <button type="button" disabled={busy} onClick={() => input.current?.click()} aria-label={`${label} of ${asName}`} className="btn-secondary flex-1 justify-center">
+          <UploadIcon className="size-4" /> {busy ? "Uploading…" : label}
+        </button>
+      ) : asName ? (
         <button
           type="button"
           disabled={busy}

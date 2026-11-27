@@ -1,6 +1,6 @@
 # CuraLex - DMS: Not built yet
 
-**As of:** 2026-11-27 (code up to migration `20261127090000_roles.sql`)
+**As of:** 2026-11-28 (code up to migration `20261128000000_document_details.sql`)
 **Related:** [`roles-and-permissions.md`](./roles-and-permissions.md), [`compliance-gap-assessment.md`](./compliance-gap-assessment.md), [`how-the-app-works.md`](./how-the-app-works.md)
 
 Everything discussed or planned that does not exist in the app yet, grouped by area. "Basis" points to where the requirement or decision comes from.
@@ -27,7 +27,9 @@ Everything discussed or planned that does not exist in the app yet, grouped by a
 | **Watermarking** | Downloaded/viewed files stamped with exporter company, user email and time, for traceability of leaks | Sharing design | M |
 | **In-browser viewer** | View documents inside the app (needed for genuinely view-only shares) instead of the raw file in a new tab | Sharing design | M |
 | **Document requests** | Exporter requests specific documents from a manufacturer for a product (e.g. CoPP for Kenya, due date); tracked as Requested / Shared / Overdue | Discussed for product pages | M |
-| **Expiry reminders** | Email/in-app reminders before shares expire and before CoPP / GMP certificates expire | "Coming next" cards; login page feature list | M |
+| **Expiry reminders** | Email/in-app reminders before shares expire and before CoPP / GMP certificates expire (expiry dates and on-screen warnings exist; emails don't) | "Coming next" cards; login page feature list | M |
+| **Notifications** | Bell in the header for exporter downloads, shares ending, document requests | Layout mockup | M |
+| **Per-market document checklists** | Required documents per product and market, so "Product readiness" can say "Ready to file" / "Missing: stability data" | Layout mockup | M |
 | **Restrict exporter users by product / manufacturer** | Limit which products or manufacturers an exporter user can see | Roles doc decision 5 (not now) | M |
 
 ## 3. Users, sessions and security

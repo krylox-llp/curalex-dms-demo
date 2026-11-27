@@ -2,14 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
+import Link from "next/link";
 import { DeleteDialog } from "@/components/manufacturer/delete-dialog";
+import { DetailsDialog } from "@/components/manufacturer/details-dialog";
+import { ExporterAvatars } from "@/components/manufacturer/exporter-avatars";
 import { useCan } from "@/components/permissions";
 import { DownloadIcon, FileIcon } from "@/components/manufacturer/icons";
 import { RowMenu } from "@/components/manufacturer/row-menu";
 import { useSelection } from "@/components/manufacturer/selection";
 import { UploadButton } from "@/components/manufacturer/upload";
 import type { DeleteTarget } from "@/app/manufacturer/actions";
-import { formatBytes, type DocumentWithVersions, type Version } from "@/lib/documents-shared";
+import { docType, expiryBadge, formatBytes, formatDate, type DocumentWithVersions, type Version } from "@/lib/documents-shared";
 import { createClient } from "@/lib/supabase/client";
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -22,7 +25,30 @@ async function downloadVersion(name: string, version: Version) {
   window.location.assign(data.signedUrl);
 }
 
-export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId: string | null }) {
+export function FileRow({
+  doc,
+  folderId,
+  today,
+  detailsHref,
+  folderLabel,
+  products,
+  current,
+  compact = false,
+}: {
+  doc: DocumentWithVersions;
+  folderId: string | null;
+  /** YYYY-MM-DD, for expiry badges. */
+  today: string;
+  /** Opens this document in the details panel. */
+  detailsHref: string;
+  /** Folder path, shown when listing documents from several folders. */
+  folderLabel?: string;
+  products: string[];
+  /** This document is open in the details panel. */
+  current?: boolean;
+  /** The details panel is open: hide columns the panel already shows. */
+  compact?: boolean;
+}) {
   const router = useRouter();
   const canEdit = useCan("documents.edit");
   const canDelete = useCan("documents.delete");
@@ -33,6 +59,9 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
   const [showHistory, setShowHistory] = useState(false);
   const [deleting, setDeleting] = useState<{ target: DeleteTarget; label: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const type = docType(doc.details.doc_type);
+  const expiry = expiryBadge(doc.details.expiry_date, today);
 
   // When selected, the shared selection decides the version; otherwise the row's own picker does.
   const versionId =
@@ -50,7 +79,7 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
 
   return (
     <Fragment>
-      <tr aria-selected={Boolean(chosen)}>
+      <tr aria-selected={Boolean(chosen)} className={current ? "[&>td]:bg-primary-10/60" : undefined}>
         <td className="w-10">
           {canSelect && (
             <input
@@ -62,12 +91,21 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
             />
           )}
         </td>
-        <td className="max-w-0 w-[45%]">
-          <span className="flex items-center gap-2.5 font-medium text-header">
+        <td className={`max-w-0 ${compact ? "w-[45%] min-w-48" : "w-[32%] min-w-56"}`}>
+          <Link href={detailsHref} scroll={false} className="group flex items-center gap-2.5 font-medium text-header" aria-current={current ? "true" : undefined}>
             <FileIcon className="size-4 shrink-0 text-tertiary" />
-            <span className="truncate" title={doc.name}>{doc.name}</span>
-          </span>
+            <span className="min-w-0">
+              <span className="block truncate group-hover:text-primary-text group-hover:underline" title={doc.name}>{doc.name}</span>
+              {folderLabel && <span className="block truncate text-xs font-normal text-secondary">{folderLabel}</span>}
+            </span>
+          </Link>
         </td>
+        <td>{type ? <span className="doc-type" title={type.label}>{type.short}</span> : <span className="text-tertiary">—</span>}</td>
+        {!compact && (
+          <td className="max-w-0 w-[18%]">
+            <span className="block truncate text-secondary" title={doc.details.product ?? undefined}>{doc.details.product ?? "—"}</span>
+          </td>
+        )}
         <td>
           {doc.versions.length > 1 ? (
             <select
@@ -90,8 +128,17 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
             <span className="pl-1.5 text-secondary">v{version.version}</span>
           )}
         </td>
-        <td className="whitespace-nowrap text-secondary">{formatBytes(version.size_bytes)}</td>
-        <td className="whitespace-nowrap text-secondary">{dateFmt.format(new Date(version.created_at))}</td>
+        <td className="whitespace-nowrap">
+          {doc.details.expiry_date ? (
+            <span className="inline-flex items-center gap-2">
+              <span className={expiry?.tone === "error" ? "text-error-text" : "text-body"}>{formatDate(doc.details.expiry_date)}</span>
+              {expiry && <span className={`badge badge-sm badge-${expiry.tone}`}>{expiry.label}</span>}
+            </span>
+          ) : (
+            <span className="text-tertiary">—</span>
+          )}
+        </td>
+        {!compact && <td><ExporterAvatars shares={doc.shares} /></td>}
         <td className="w-px whitespace-nowrap text-right">
           <span className="inline-flex items-center">
             {canEdit && <UploadButton folderId={folderId} asName={doc.name} />}
@@ -107,6 +154,8 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
             <RowMenu
               label={`Actions for ${doc.name}`}
               items={[
+                { label: "Details", onSelect: () => router.push(detailsHref, { scroll: false }) },
+                ...(canEdit ? [{ label: "Edit details", onSelect: () => setEditing(true) }] : []),
                 {
                   label: showHistory ? "Hide version history" : `Version history (${doc.versions.length})`,
                   onSelect: () => setShowHistory((s) => !s),
@@ -130,7 +179,7 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
       {showHistory && (
         <tr>
           <td className="bg-contrast-5" />
-          <td colSpan={5} className="bg-contrast-5 pb-4 pt-1">
+          <td colSpan={compact ? 5 : 7} className="bg-contrast-5 pb-4 pt-1">
             <div className="data-grid data-grid-compact">
               <table>
                 <caption className="border-b border-contrast-10 px-2 py-2 text-left text-sm font-semibold text-header">
@@ -169,6 +218,10 @@ export function FileRow({ doc, folderId }: { doc: DocumentWithVersions; folderId
             </div>
           </td>
         </tr>
+      )}
+
+      {editing && (
+        <DetailsDialog documentId={doc.id} name={doc.name} details={doc.details} products={products} onClose={() => setEditing(false)} />
       )}
 
       {deleting && (

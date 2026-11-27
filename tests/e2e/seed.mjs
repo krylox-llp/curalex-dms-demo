@@ -40,17 +40,23 @@ const exporter = await rpc(clients.manufacturer, "invite_exporter", { p_company:
 await rpc(clients.manufacturer2, "invite_exporter", { p_company: "Tarangini", p_email: people.exporter[0] });
 await rpc(clients.exporter, "accept_invitation");
 
-async function shareFile(c, name, days) {
+const inDays = (n) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
+
+async function shareFile(c, name, days, details) {
   const r = await rpc(c, "reserve_upload", { p_folder: null, p_file_name: name });
   const up = await c.storage.from("documents").upload(r.storage_path, new Blob([`%PDF-1.4 ${name}`], { type: "application/pdf" }), { contentType: "application/pdf" });
   if (up.error) throw up.error;
   await rpc(c, "complete_upload", { p_version: r.version_id, p_size: name.length, p_mime: "application/pdf" });
   await rpc(c, "share_versions", { p_exporter: exporter.org_id, p_items: [{ version_id: r.version_id, days }] });
+  if (details) {
+    const { data } = await c.from("documents").select("id").eq("name", name).single();
+    await rpc(c, "set_document_details", { p_document: data.id, p_details: details });
+  }
 }
-await shareFile(clients.manufacturer, "CoA - Paracetamol 500mg Tablets.pdf", 30);
-await shareFile(clients.manufacturer, "WHO-GMP Certificate.pdf", 5);
-await shareFile(clients.manufacturer, "CoPP - Kenya.pdf", 365);
-await shareFile(clients.manufacturer2, "API DMF - Paracetamol.pdf", 90);
+await shareFile(clients.manufacturer, "CoA - Paracetamol 500mg Tablets.pdf", 30, { doc_type: "coa", product: "Paracetamol 500 mg Tablets", reference_no: "B2211" });
+await shareFile(clients.manufacturer, "WHO-GMP Certificate.pdf", 5, { doc_type: "gmp", issued_by: "CDSCO", issue_date: inDays(-1060), expiry_date: inDays(35) });
+await shareFile(clients.manufacturer, "CoPP - Kenya.pdf", 365, { doc_type: "copp", product: "Paracetamol 500 mg Tablets", market: "Kenya", issued_by: "CDSCO, New Delhi", reference_no: "CDSCO/CoPP/2024/1187", issue_date: inDays(-718), expiry_date: inDays(12) });
+await shareFile(clients.manufacturer2, "API DMF - Paracetamol.pdf", 90, { doc_type: "dmf", product: "Paracetamol API" });
 await shareFile(clients.manufacturer2, "API CoA Batch 2211.pdf", null);
 
 const product = await rpc(clients.exporter, "create_fpp", { p_name: "Paracetamol 500 mg Tablets", p_details: "Kenya" });

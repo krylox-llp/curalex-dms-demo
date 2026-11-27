@@ -125,7 +125,7 @@ export function FppMenu({ fpp }: { fpp: { id: string; name: string; details: str
                 type="button"
                 className="btn-error-primary"
                 disabled={pending}
-                onClick={() => run(() => deleteFpp(fpp.id), () => router.push("/exporter"))}
+                onClick={() => run(() => deleteFpp(fpp.id), () => router.push("/exporter/products"))}
               >
                 {pending ? "Deleting…" : "Delete product"}
               </button>

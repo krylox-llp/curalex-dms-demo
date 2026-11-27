@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { AppShell, AppShellSkeleton, PageHeader } from "@/components/app-shell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { ManufacturerNav } from "@/components/manufacturer/nav";
 import { ShareForm, type ShareFile } from "@/components/manufacturer/share-form";
 import { requireAccount, requirePermission } from "@/lib/account";
 import { folderPathLabel, getFolders, isUuid } from "@/lib/documents";
@@ -49,16 +48,16 @@ async function Share({ searchParams }: Pick<PageProps<"/manufacturer/share">, "s
   const exporters = (exportersRes.data ?? []) as { org_id: string; name: string; status: string }[];
 
   return (
-    <AppShell account={account} area="company" nav={<ManufacturerNav />}>
+    <AppShell account={account} area="company">
       <PageHeader
         title="Share files"
         description="Set how long the exporter can access each file, then choose who to share with."
-        breadcrumb={<Breadcrumbs items={[{ label: "Documents", href: "/manufacturer" }, { label: "Share files" }]} />}
+        breadcrumb={<Breadcrumbs items={[{ label: "Documents", href: "/manufacturer/documents" }, { label: "Share files" }]} />}
       />
       {files.length === 0 ? (
         <div className="card px-6 py-14 text-center text-secondary">
           No files selected.{" "}
-          <Link href="/manufacturer" className="font-medium text-primary-text hover:underline">Select files in Documents</Link>.
+          <Link href="/manufacturer/documents" className="font-medium text-primary-text hover:underline">Select files in Documents</Link>.
         </div>
       ) : (
         <ShareForm files={files} exporters={exporters} initialExporterId={isUuid(to) ? to : undefined} />

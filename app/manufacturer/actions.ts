@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { sendInviteEmail, type EmailStatus } from "@/lib/email/send-invite";
 import { withReason } from "@/lib/audit-reason";
+import type { DocDetails } from "@/lib/documents-shared";
 import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; message: string };
@@ -19,6 +20,9 @@ const ERRORS: Record<string, string> = {
   invalid_input: "Enter the exporter's company name and a valid email address.",
   not_an_exporter: "That email belongs to a manufacturer, not an exporter.",
   admin_email: "That email belongs to a CuraLex admin and can't be invited.",
+  expiry_before_issue: "The expiry date must be on or after the issue date.",
+  invalid_date: "Enter valid dates.",
+  invalid_details: "Check the details: choose a type from the list and keep text fields short.",
 };
 
 function message(raw: string) {
@@ -29,6 +33,15 @@ function message(raw: string) {
 export async function createFolder(parentId: string | null, name: string): Promise<ActionResult> {
   const supabase = await createClient();
   const { error } = await supabase.rpc("create_folder", { p_parent: parentId, p_name: name });
+  if (error) return { ok: false, message: message(error.message) };
+  refresh();
+  return { ok: true };
+}
+
+/** Saves a document's details (type, product, market, issuer, reference number, dates). */
+export async function setDocumentDetails(documentId: string, details: DocDetails): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_document_details", { p_document: documentId, p_details: details });
   if (error) return { ok: false, message: message(error.message) };
   refresh();
   return { ok: true };

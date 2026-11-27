@@ -1,7 +1,7 @@
 # How CuraLex - DMS works
 
 **Audience:** product owners, developers, QA and anyone onboarding to the project
-**Describes:** the code at 2026-11-27 (migrations up to `20261127090000_roles.sql`)
+**Describes:** the code at 2026-11-28 (migrations up to `20261128000000_document_details.sql`)
 **Related:** [`compliance-gap-assessment.md`](./compliance-gap-assessment.md)
 
 ---
@@ -123,15 +123,32 @@ If a manufacturer invites an email that already belongs to (or is invited to) an
 
 ## 4. The manufacturer workspace
 
-Tabs: **Documents | Shared with**. The header shows the CuraLex - DMS logo (links home); clicking the avatar opens the profile menu: name, email, company, **Audit trail** and **Team** (only for roles allowed to use them) and **Sign out**.
+**Layout (all workspaces):** a header with the CuraLex - DMS logo (links home), a **search box** (Ctrl/⌘+K) and the avatar menu (name, email, company, Sign out); below it a **left sidebar**: Overview, Documents (with counts and top-level folders), Shared with, and a **Company** section with Audit trail and Team (only for roles allowed to use them). On small screens the sidebar becomes a scrolling bar under the header.
 
-### 4.1 Documents (`/manufacturer`)
+### 4.0 Overview (`/manufacturer`)
+
+- **Key figures:** controlled documents (and new versions in 30 days), active shares and exporters, documents **expiring within 30 days** (from recorded expiry dates), and exporter views/downloads in the last 7 days (roles with `activity.view`; otherwise the number of exporters).
+- **Needs attention:** documents expired or expiring within 30 days, shares ending within 7 days, exporters holding an **older version** than the latest (with a one-click "Share vN"), and a nudge when documents have no type or details yet.
+- **Recent exporter activity** (views and downloads) and an **Exporters** table (documents shared, last activity, next access end, status).
+
+### 4.0.1 Document details
+
+Each document can carry **type** (CoA, CoPP, GMP, licence, DMF, stability, BE study, specification, SOP, validation, ISO, other), **product**, **target market**, **issued by**, **reference/certificate number**, **issue date** and **expiry date**. They are edited in an **Edit details** dialog (Document author role, `set_document_details()`), apply to the document across versions (update the dates when a renewal is uploaded), and every change is in the audit trail as "File details updated" with old and new values. Exporters see the type, product and expiry date of documents shared with them.
+
+### 4.0.2 Search (`/manufacturer/search`)
+
+The header search finds documents (name, product, reference number, market, issuer, type), folders and exporters.
+
+### 4.1 Documents (`/manufacturer/documents`)
 
 - **Folders and files.** Folders can be nested; folder names show with a trailing "/" (e.g. `Quality/`). Breadcrumbs (Documents › Quality › CoA) appear inside a folder.
 - **New folder** and **Upload files** (several at once, up to 50 MB each).
 - **Versions.** Uploading a file whose name already exists in that folder (any letter case) creates the **next version**: v1, v2, v3… Each file row also has an **upload icon** to add a new version directly.
 - **Version picker.** Each file row shows the latest version by default; a dropdown picks an older one.
 - **Row actions:** upload new version, download, and a ⋯ menu with **Version history** (every version with download and delete), **Audit history** and **Delete file**.
+- **Columns:** name, type, product, version, **expiry** (red badge within 30 days or expired, amber within 90), **shared with** (exporter initials) and actions.
+- **Filters:** name/product/reference search, type, product and expiry (expired, ≤ 30 days, ≤ 90 days, no expiry date). Any filter searches **all folders** and shows each file's folder; filters live in the URL.
+- **Details panel:** clicking a file name opens a panel on the right with tabs **Details** (all document details, Edit details), **Versions** (with download), **Access** (which exporters hold which version and until when, flagging older versions) and **Activity** (exporter views/downloads, link to the full audit history), plus **Share** and **New version** buttons.
 - **Folder ⋯ menu:** Delete folder (and everything in it).
 - **Selecting files to share.** Tick files in any folder and pick a version for each. The selection is kept while moving between folders, and a bar at the bottom shows "3 files selected · across folders · Clear · Delete · Share →".
 
@@ -198,9 +215,17 @@ Share history and the access log are kept. Re-inviting the same email reconnects
 
 ## 5. The exporter workspace
 
-Tabs: **Products | Shared with me**. **Audit trail** (Company admin, Regulatory / quality) and **Team** (Company admin) are in the profile menu. Viewers can view documents in the browser but not download them or edit products.
+Sidebar: **Overview | Products | Shared with me**, then Company: **Audit trail** (Company admin, Regulatory / quality) and **Team** (Company admin). Viewers can view documents in the browser but not download them or edit products.
 
-### 5.1 Products (`/exporter`)
+### 5.0 Overview (`/exporter`)
+
+- **Key figures:** products, documents received (and new this week), certificates expiring within 30 days (the manufacturers' expiry dates) and access ending within 30 days.
+- **Product readiness:** each product with its manufacturers, how many attached documents are still available, what needs attention (no longer available, expired, expiring, access ending, newer version exists) and a status (Up to date / Check soon / Action needed / No documents). There is no per-market checklist of required documents yet.
+- **Needs attention** and **Recently received** lists.
+- Shared-document tables show **type**, **expiry** and **"Superseded by vN"** when the manufacturer has a newer version than the one shared.
+- **Search** (`/exporter/search`) finds products, shared documents and manufacturers.
+
+### 5.1 Products (`/exporter/products`)
 
 A "product" is a **finished pharmaceutical product (FPP)** the exporter deals in, such as "Paracetamol 500 mg Tablets – Kenya". The list shows each product with its manufacturers, number of documents and what needs attention (expired, expiring soon, no longer shared).
 
@@ -237,7 +262,7 @@ Anything else gets **403**. Exporters cannot read the storage bucket directly.
 
 ## 6. The admin workspace
 
-No tab bar; **Companies** and **Audit trail** are in the profile menu. The header shows "CuraLex - DMS · Admin".
+Sidebar with **Companies** and **Audit trail**. The header shows "CuraLex - DMS · Admin".
 
 - **Companies** (`/admin`): invite a company (company name, contact email, role) and see every company with role, contact, who invited it, invitation date and status (Active or Invited).
 - **Audit trail** (`/admin/audit`): all activity across the platform, plus an **integrity check** that re-computes the audit hash chain ("Integrity check passed: N entries verified, hash chain intact.").
@@ -278,7 +303,7 @@ Each entry stores: database timestamp (`clock_timestamp()`), user ID and email, 
 
 ### 7.5 Screens
 
-- **Audit trail** page (profile menu) for manufacturers, exporters and admins, with a category filter (Documents, Sharing, Views & downloads, Companies & users, Products), search (file, user or reason), "Older entries" paging and **Export CSV**.
+- **Audit trail** page (sidebar) for manufacturers, exporters and admins, with a category filter (Documents, Sharing, Views & downloads, Companies & users, Products), search (file, user or reason), "Older entries" paging and **Export CSV**.
 - **Per-document history:** a file's ⋯ → Audit history (`?document=<id>`).
 - **CSV export** (`/audit/export`): full old and new values and hashes, UTF-8 with BOM, protected against spreadsheet formula injection.
 - Times are shown in **UTC**.
@@ -347,7 +372,7 @@ All tables are in the `public` schema (plus Supabase's `auth.users` and `storage
 | Table | Purpose |
 |---|---|
 | `folders` | Nested folders per manufacturer (`parent_id`), `deleted_at` |
-| `documents` | One per file name in a folder; `deleted_at` |
+| `documents` | One per file name in a folder; details (`doc_type`, `product`, `market`, `issued_by`, `reference_no`, `issue_date`, `expiry_date`); `deleted_at` |
 | `document_versions` | v1, v2… per document: `storage_path`, `status` (`pending` or `ready`), size, MIME type, `deleted_at` |
 | `document_shares` | Version → exporter: `expires_at` (null = no expiry), `revoked_at`; at most one live share per version and exporter |
 | `access_events` | Exporter view or download of a share (append-only) |
@@ -531,6 +556,7 @@ Run the migrations in `supabase/migrations/` **in order** on the Supabase projec
 7. `20261127060000_remove_exporter.sql`
 8. `20261127080000_audit_trail.sql`
 9. `20261127090000_roles.sql` (existing users keep full access through founder roles)
+10. `20261128000000_document_details.sql` (document details; without it the Documents and Overview pages show an "out of date" error)
 
 Then add yourself as admin:
 
@@ -559,12 +585,12 @@ Optional local Supabase (Docker): `supabase start`, then `supabase db reset` to 
 
 ## 18. Testing
 
-During development, behaviour was verified against a **local Supabase stack** with:
+Tests live in `tests/` and run against a **local Supabase stack** (see `tests/README.md`):
 
-- **SQL/API permission suites** (signed-in test users via supabase-js), covering invitations, isolation between companies, uploads and storage policies, versioning, sharing, expiry, revocation, deletion, exporter access and logging, products, exporter removal and the audit trail. That's ~180 checks in total.
-- **Browser end-to-end runs** (headless Chrome via the DevTools protocol) for the main flows, including real keyboard and mouse checks of menus and dialogs.
+- `pnpm test:db`: SQL/API permission suites (about 205 checks): invitations, company isolation, uploads and storage, versioning, sharing, expiry, revocation, deletion, exporter access and logging, products, exporter removal, audit trail, roles and document details.
+- `pnpm test:e2e`: seeds data, builds and starts the app and runs a headless-Chrome smoke test (overview, sidebar, documents, filters, details panel, search, menus, dialogs, secure download).
 
-These scripts lived in a scratch directory during development and are **not yet in the repository or CI**. Bringing them into the repo under change control is part of the validation work (compliance document, workstream 4.5).
+They are not in CI yet (compliance document, workstream 4.5).
 
 Run `pnpm build`, `pnpm lint` and `npx tsc --noEmit` before committing.
 

@@ -16,7 +16,7 @@ supabase db reset     # optional: apply all migrations to a clean database
 
 | Command | What it runs |
 |---|---|
-| `pnpm test:db` | Database / permission suites in `tests/db/` (about 190 checks) |
+| `pnpm test:db` | Database / permission suites in `tests/db/` (about 205 checks) |
 | `pnpm test:db roles` | Only suites whose file name contains "roles" |
 | `VERBOSE=1 pnpm test:db` | Print every PASS line, not just failures and totals |
 | `pnpm test:e2e` | Seeds data, builds and starts the app on port 3125, runs the browser smoke test, stops the app |
@@ -40,10 +40,11 @@ tests/
     04-remove-exporter.test.mjs     removing an exporter revokes everything
     05-audit-trail.test.mjs         append-only log, hash chain, reasons, visibility
     06-roles.test.mjs               roles, permissions, team management, deactivation
+    07-document-details.test.mjs    document type, product, dates; permissions; audit; exporter view
   e2e/
     browser.mjs                     tiny headless-Chrome driver (DevTools protocol, no dependencies)
     seed.mjs                        2 manufacturers, 1 exporter, 5 shared files, 1 product
-    smoke.test.mjs                  main screens, menus, dialogs, secure download route
+    smoke.test.mjs                  overview, sidebar, documents, filters, details panel, search, menus, dialogs, secure download
     run.mjs                         seed → build → start → smoke test → stop
     .state/                         sessions and screenshots (git-ignored)
 ```

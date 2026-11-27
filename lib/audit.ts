@@ -27,7 +27,7 @@ export const ACTION_LABEL: Record<string, string> = {
   "document.created": "File created",
   "document.renamed": "File renamed",
   "document.deleted": "File deleted",
-  "document.updated": "File updated",
+  "document.updated": "File details updated",
   "version.uploaded": "Version uploaded",
   "version.deleted": "Version deleted",
   "version.moved": "Version moved",

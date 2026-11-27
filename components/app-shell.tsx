@@ -1,71 +1,83 @@
 import Link from "next/link";
+import { GlobalSearch } from "@/components/global-search";
 import { Logo } from "@/components/logo";
 import { PermissionsProvider } from "@/components/permissions";
+import { Sidebar } from "@/components/sidebar";
 import { UserMenu } from "@/components/user-menu";
-import { can, ORG_TYPE_LABEL, type Account } from "@/lib/account";
+import { ORG_TYPE_LABEL, type Account } from "@/lib/account";
+import { getNavSections } from "@/lib/nav";
 
 /**
- * Signed-in layout: CuraLex logo on the left, avatar menu (with the user's company) on the right.
+ * Signed-in layout: header (logo, search, avatar menu) over a left sidebar with the workspace's pages.
  * Admin pages always show the admin context, even if the admin's account also belongs to a company.
  */
-export function AppShell({
+export async function AppShell({
   account,
   area,
-  nav,
   children,
 }: {
   account: Account;
   area: "admin" | "company";
-  /** Optional tab bar shown under the header. */
-  nav?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const company =
     area === "company" && account.org
       ? { name: account.org.name, role: ORG_TYPE_LABEL[account.org.type] }
       : { name: "CuraLex - DMS", role: "Platform admin" };
+  const sections = await getNavSections(account, area);
+  const searchBase = area === "company" && account.org ? `/${account.org.type}/search` : null;
 
   return (
     <PermissionsProvider permissions={account.permissions}>
-    <div className="flex flex-1 flex-col bg-base">
-      <header className="border-b border-contrast-10 bg-base">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <div className="flex items-center gap-3">
-            <Link href="/" aria-label="CuraLex - DMS home" className="rounded-lumo-m focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-50">
-              <Logo size="sm" />
-            </Link>
-            {area === "admin" && (
-              <span className="badge badge-contrast badge-sm">Admin</span>
+      <div className="flex flex-1 flex-col bg-contrast-5/40">
+        <header className="sticky top-0 z-30 border-b border-contrast-10 bg-base">
+          <div className="flex h-15 items-center gap-4 px-4 md:px-6">
+            <div className="flex shrink-0 items-center gap-3 md:w-52">
+              <Link href="/" aria-label="CuraLex - DMS home" className="rounded-lumo-m focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-50">
+                <Logo size="sm" />
+              </Link>
+              {area === "admin" && <span className="badge badge-contrast badge-sm">Admin</span>}
+            </div>
+            {searchBase ? (
+              <GlobalSearch
+                action={searchBase}
+                placeholder={account.org?.type === "exporter" ? "Search products, manufacturers, documents…" : "Search documents, exporters…"}
+              />
+            ) : (
+              <span className="flex-1" />
             )}
+            <div className="ml-auto shrink-0">
+              <UserMenu name={account.name} email={account.email} avatarUrl={account.avatarUrl} company={company} />
+            </div>
           </div>
-          <UserMenu
-            name={account.name}
-            email={account.email}
-            avatarUrl={account.avatarUrl}
-            company={company}
-            links={profileLinks(account, area)}
-          />
+        </header>
+        <div className="flex flex-1 flex-col md:flex-row">
+          <Sidebar sections={sections} company={company} />
+          <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-7">
+            <div className="mx-auto max-w-[90rem]">{children}</div>
+          </main>
         </div>
-        {nav && <div className="mx-auto max-w-6xl px-6">{nav}</div>}
-      </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
-    </div>
+      </div>
     </PermissionsProvider>
   );
 }
 
 export function AppShellSkeleton() {
   return (
-    <div className="flex flex-1 flex-col bg-base" aria-busy="true">
+    <div className="flex flex-1 flex-col bg-contrast-5/40" aria-busy="true">
       <header className="border-b border-contrast-10 bg-base">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <div className="flex h-15 items-center justify-between px-6">
           <span className="h-5 w-40 animate-pulse rounded bg-contrast-10" />
           <span className="size-9 animate-pulse rounded-full bg-contrast-10" />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
-        <span className="block h-40 animate-pulse rounded-lumo-l bg-contrast-10" />
-      </main>
+      <div className="flex flex-1">
+        <span className="hidden w-60 border-r border-contrast-10 bg-base md:block" />
+        <main className="flex-1 px-8 py-7">
+          <span className="block h-8 w-64 animate-pulse rounded bg-contrast-10" />
+          <span className="mt-6 block h-40 animate-pulse rounded-lumo-l bg-contrast-10" />
+        </main>
+      </div>
     </div>
   );
 }
@@ -140,19 +152,4 @@ export function PageHeader({
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
-}
-
-/** Links shown in the profile menu: Audit trail and Team (per permission), or the admin pages. */
-function profileLinks(account: Account, area: "admin" | "company") {
-  if (area === "admin") {
-    return [
-      { href: "/admin", label: "Companies" },
-      { href: "/admin/audit", label: "Audit trail" },
-    ];
-  }
-  const base = `/${account.org?.type ?? ""}`;
-  return [
-    ...(can(account, "audit.view") ? [{ href: `${base}/audit`, label: "Audit trail" }] : []),
-    ...(can(account, "users.manage") ? [{ href: `${base}/team`, label: "Team" }] : []),
-  ];
 }
