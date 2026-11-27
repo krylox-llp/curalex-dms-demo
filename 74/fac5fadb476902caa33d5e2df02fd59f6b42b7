@@ -1,0 +1,99 @@
+components/login/role-login.tsx
+  s_a50acd1b03b8a4::t_05d234ed611e4c 67-68
+components/manufacturer/nav.tsx
+  s_a50acd1b03b8a4::t_806a939e8b1738 5-6,11-12,17-20,23
+app/manufacturer/audit/page.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 6,21
+components/manufacturer/folder-row.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 8,13,24-26
+components/exporter/nav.tsx
+  s_a50acd1b03b8a4::t_806a939e8b1738 5-6,11-12,17-20,23
+components/manufacturer/file-row.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 6,27-29,55-63,97,115-122,152,163
+docs/compliance-gap-assessment.md
+  s_a50acd1b03b8a4::t_7d991ef45eb1cc 5
+  s_a50acd1b03b8a4::t_6e5756a507064b 120-123
+  s_a50acd1b03b8a4::t_1f32b8cbb62a29 52-53
+  s_a50acd1b03b8a4::t_7227dcaece411e 1-4,6-51,54-119,124-174
+app/login/page.tsx
+  s_a50acd1b03b8a4::t_05d234ed611e4c 70-72
+app/manufacturer/shared/[exporterId]/page.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 10,48-49,53,70
+app/auth/callback/route.ts
+  s_a50acd1b03b8a4::t_629c282b5c78f4 29,33
+docs/roles-and-permissions.md
+  s_a50acd1b03b8a4::t_eea2f8a8f1c77d 1-2,4-126
+  s_a50acd1b03b8a4::t_667c867f757f18 3
+lib/roles.ts
+  s_a50acd1b03b8a4::t_05d234ed611e4c 1-35
+components/team.tsx
+  s_a50acd1b03b8a4::t_806a939e8b1738 1-263
+app/manufacturer/share/page.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 8,24
+components/manufacturer/selection-bar.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 7,13-15,26-31,36
+docs/how-the-app-works.md
+  s_a50acd1b03b8a4::t_3c8ffd82d10e0c 1-3,5-60,62-63,80-125,127-200,202-532,534-578,580-585
+  s_a50acd1b03b8a4::t_667c867f757f18 4,61,64-79,126,201,533,579
+app/exporter/page.tsx
+  s_a50acd1b03b8a4::t_da09378d175db6 7,29
+supabase/migrations/20261127090000_roles.sql
+  s_a50acd1b03b8a4::t_498adf79a39b56 143-147,150,153
+  s_a50acd1b03b8a4::t_09d1c7d72a0897 1-142,148-149,151-152,154-1108
+app/manufacturer/shared/page.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 8,43,87
+components/app-shell.tsx
+  s_a50acd1b03b8a4::t_05d234ed611e4c 2,28,44
+app/manufacturer/page.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 14,61-66
+lib/email/invite.ts
+  s_a50acd1b03b8a4::t_629c282b5c78f4 24,37,91-105
+  s_a50acd1b03b8a4::t_7938a4d431e01c 106-107
+app/exporter/team/page.tsx
+  s_a50acd1b03b8a4::t_806a939e8b1738 1-26
+app/exporter/fpps/[fppId]/page.tsx
+  s_a50acd1b03b8a4::t_da09378d175db6 9,38-43,54-58,72-77
+app/manufacturer/team/page.tsx
+  s_a50acd1b03b8a4::t_806a939e8b1738 1-26
+lib/account.ts
+  s_a50acd1b03b8a4::t_05d234ed611e4c 3,16-19,22-24,51-58,66-68,89,96-99
+  s_a50acd1b03b8a4::t_6d94d9e6f0112b 100
+components/team-page.tsx
+  s_a50acd1b03b8a4::t_806a939e8b1738 1-23
+app/team/actions.ts
+  s_a50acd1b03b8a4::t_629c282b5c78f4 1-65
+lib/audit.ts
+  s_a50acd1b03b8a4::t_a3b40d70fde96c 93-96,98-101,118-119
+components/exporter/docs-table.tsx
+  s_a50acd1b03b8a4::t_da09378d175db6 8,32-33,82,89,92
+docs/not-built-yet.md
+  s_a50acd1b03b8a4::t_cee44dbd8073a8 1-99
+components/manufacturer/shares-table.tsx
+  s_a50acd1b03b8a4::t_da09378d175db6 9,44-46,85,137,144,150,163,176,190,192-207
+components/audit-view.tsx
+  s_a50acd1b03b8a4::t_a3b40d70fde96c 6-7
+app/audit/export/route.ts
+  s_a50acd1b03b8a4::t_a3b40d70fde96c 7-8
+components/permissions.tsx
+  s_a50acd1b03b8a4::t_05d234ed611e4c 1-16
+app/exporter/audit/page.tsx
+  s_a50acd1b03b8a4::t_1da66857571557 6,21
+lib/email/send-invite.ts
+  s_a50acd1b03b8a4::t_629c282b5c78f4 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "74fac5fadb476902caa33d5e2df02fd59f6b42b7",
+  "prompts": {},
+  "sessions": {
+    "s_a50acd1b03b8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46bd6840-fcbf-46f0-86fd-9217f45fd74c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jagadeesh J <jagadeesh@krylox.ai>"
+    }
+  }
+}
