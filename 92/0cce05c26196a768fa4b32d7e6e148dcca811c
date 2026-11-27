@@ -1,0 +1,40 @@
+lib/site-url.ts
+  s_a50acd1b03b8a4::t_f5e88a3e08716e 1-15
+lib/email/invite.ts
+  s_a50acd1b03b8a4::t_f5e88a3e08716e 1-89
+.env.example
+  s_a50acd1b03b8a4::t_96bac55c001410 11-12
+  s_a50acd1b03b8a4::t_9ea366efa8fd14 8-10,13-14
+app/actions.ts
+  s_a50acd1b03b8a4::t_7abcc4f7acfbda 4,8-9,51-53,69-74,76-77
+lib/email/send-invite.ts
+  s_a50acd1b03b8a4::t_7abcc4f7acfbda 1-27
+lib/email/resend.ts
+  s_a50acd1b03b8a4::t_96bac55c001410 5-6,10
+  s_a50acd1b03b8a4::t_f5e88a3e08716e 1-4,7-9,11-42
+app/manufacturer/actions.ts
+  s_a50acd1b03b8a4::t_cd232a8cf6f740 4,45-46,54-60,79-95
+components/invite-form.tsx
+  s_a50acd1b03b8a4::t_cd232a8cf6f740 5,77-81,84-86,91,97-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "920cce05c26196a768fa4b32d7e6e148dcca811c",
+  "prompts": {},
+  "humans": {
+    "h_aaadf2e6c798e3": {
+      "author": "Jagadeesh J <jagadeesh@krylox.ai>"
+    }
+  },
+  "sessions": {
+    "s_a50acd1b03b8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46bd6840-fcbf-46f0-86fd-9217f45fd74c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jagadeesh J <jagadeesh@krylox.ai>"
+    }
+  }
+}
