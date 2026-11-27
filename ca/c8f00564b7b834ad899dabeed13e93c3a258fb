@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cac8f00564b7b834ad899dabeed13e93c3a258fb",
+  "prompts": {},
+  "humans": {
+    "h_aaadf2e6c798e3": {
+      "author": "Jagadeesh J <jagadeesh@krylox.ai>"
+    }
+  }
+}
