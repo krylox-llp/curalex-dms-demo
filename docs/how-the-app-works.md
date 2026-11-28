@@ -2,7 +2,7 @@
 
 **Audience:** product owners, developers, QA and anyone onboarding to the project
 **Describes:** the code at 2026-11-28 (migrations up to `20261128000000_document_details.sql`)
-**Related:** [`compliance-gap-assessment.md`](./compliance-gap-assessment.md)
+**Related:** [`db-schema.md`](./db-schema.md) (full data model), [`compliance-gap-assessment.md`](./compliance-gap-assessment.md)
 
 ---
 
@@ -490,33 +490,7 @@ Upload a new version (same name, or the upload icon on the row). Existing shares
 
 ## 15. Project structure
 
-```
-app/
-  login/                       chooser + /login/manufacturer + /login/exporter
-  auth/callback, auth/signout  OAuth callback (invitation acceptance, role routing), sign-out
-  admin/                       Companies, audit/
-  manufacturer/                Documents (page), share/, shared/, shared/[exporterId]/, audit/, actions.ts
-  exporter/                    Products (page), fpps/[fppId]/, shared/, shared/[manufacturerId]/, audit/, actions.ts
-  documents/[shareId]/[action] exporter view/download route (check + log + signed URL)
-  audit/export                 CSV export
-  actions.ts                   invitation server actions (admin, manufacturer)
-  globals.css                  Lumo tokens and component classes
-components/                    shared UI (app-shell, dialog, breadcrumbs, audit-view, invite-form, user-menu…)
-  manufacturer/                documents, sharing, shared-with UI
-  exporter/                    products, documents table, nav
-  login/                       login layout
-lib/
-  account.ts                   current user, company, role guards
-  documents*.ts                document loaders and client-safe helpers
-  exporter/                    exporter data loaders and helpers
-  audit.ts, audit-reason.ts    audit queries, labels, reason header
-  email/                       Resend client, invite template, sender
-  supabase/                    browser, server, proxy and admin (service-role) clients
-  site-url.ts                  absolute URL for email links
-proxy.ts                       session refresh and sign-in redirects
-supabase/migrations/           database schema, functions, policies (run in order)
-docs/                          this document, compliance gap assessment
-```
+See [`codebase-guide.md`](./codebase-guide.md) for what every folder and file does, how requests flow, and "where do I change…?".
 
 ---
 

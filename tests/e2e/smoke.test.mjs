@@ -13,7 +13,7 @@ await withBrowser(BASE, async (b) => {
   check("manufacturer lands on Overview", (await b.go("/")) === "/manufacturer");
   const sidebar = await b.eval(`[...document.querySelectorAll('nav[aria-label="Workspace"] a')].filter(a => a.offsetParent !== null).map(a => a.textContent.replace(/\\d+$/, '').trim()).join('|')`);
   check("sidebar links", sidebar === "Overview|Documents|Shared with|Audit trail|Team", sidebar);
-  check("overview flags the CoPP expiring in 12 days", (await b.eval("document.body.innerText")).includes("CoPP - Kenya.pdf expires"));
+  check("overview flags the CoPP expiring in 12 days", /CoPP - Kenya\.pdf\s+Expires in 1[12] days/.test(await b.eval("document.body.innerText")));
   await b.go("/manufacturer/documents");
   check("three files listed", (await b.eval(`${rowsText}.length`)) === 3);
   check("type and expiry shown", (await b.eval(`${rowsText}.join(' ')`)).includes("CoPP") && /\b1[12] days\b/.test(await b.eval(`${rowsText}.join(' ')`)));

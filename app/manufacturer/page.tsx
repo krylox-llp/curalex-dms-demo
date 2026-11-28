@@ -5,7 +5,7 @@ import { AppShell, AppShellSkeleton } from "@/components/app-shell";
 import { initialsOf, toneFor } from "@/components/manufacturer/exporter-avatars";
 import { InviteExporterButton } from "@/components/manufacturer/invite-exporter-dialog";
 import { UploadButton } from "@/components/manufacturer/upload";
-import { Kpi, Panel, Attention, type AttentionItem } from "@/components/overview";
+import { ActivityFeed, Attention, Kpi, Panel, type ActivityItem, type AttentionItem } from "@/components/overview";
 import { can, requireAccount } from "@/lib/account";
 import { daysUntil, formatDate, getDocuments, requestTime, todayInIndia, type DocumentWithVersions } from "@/lib/documents";
 import { createClient } from "@/lib/supabase/server";
@@ -70,10 +70,15 @@ async function Overview() {
     const exportersHolding = new Set(d.shares.map((s) => s.exporterId)).size;
     attention.push({
       key: `exp-${d.id}`,
-      badge: days < 0 ? "Expired" : days === 0 ? "Today" : `${days} day${days === 1 ? "" : "s"}`,
       tone: "error",
-      title: `${d.name} ${days < 0 ? "expired" : "expires"} ${formatDate(d.details.expiry_date)}`,
-      detail: [d.details.product, exportersHolding ? `shared with ${exportersHolding} exporter${exportersHolding === 1 ? "" : "s"}` : "not shared"].filter(Boolean).join(" · "),
+      kind: "expiry",
+      title: d.name,
+      badge: days < 0 ? "Expired" : days === 0 ? "Expires today" : `Expires in ${days} day${days === 1 ? "" : "s"}`,
+      detail: [
+        formatDate(d.details.expiry_date),
+        d.details.product,
+        exportersHolding ? `shared with ${exportersHolding} exporter${exportersHolding === 1 ? "" : "s"}` : "not shared",
+      ].filter(Boolean).join(" · "),
       action: { label: can(account, "documents.edit") ? "Upload renewal" : "Open", href: docHref(d) },
     });
   }
@@ -81,20 +86,22 @@ async function Overview() {
     const days = Math.max(0, Math.ceil((Date.parse(s.expiresAt!) - now) / DAY));
     attention.push({
       key: `share-${s.shareId}`,
-      badge: `${days} day${days === 1 ? "" : "s"}`,
       tone: "warning",
-      title: `${s.exporterName}'s access to ${s.doc.name} ends`,
-      detail: `v${s.version} · ends ${formatDate(s.expiresAt)}`,
+      kind: "clock",
+      title: s.doc.name,
+      badge: days === 0 ? "Access ends today" : `Access ends in ${days} day${days === 1 ? "" : "s"}`,
+      detail: `${s.exporterName} · v${s.version} · until ${formatDate(s.expiresAt)}`,
       action: { label: can(account, "sharing.share") ? "Extend" : "Open", href: `/manufacturer/shared/${s.exporterId}` },
     });
   }
   for (const s of shares.filter((s) => s.version < s.doc.versions[0].version)) {
     attention.push({
       key: `old-${s.shareId}`,
-      badge: "Older version",
       tone: "contrast",
-      title: `${s.exporterName} has ${s.doc.name} v${s.version}`,
-      detail: `v${s.doc.versions[0].version} is the latest version`,
+      kind: "version",
+      title: s.doc.name,
+      badge: "Older version shared",
+      detail: `${s.exporterName} has v${s.version} · latest is v${s.doc.versions[0].version}`,
       action: can(account, "sharing.share")
         ? { label: `Share v${s.doc.versions[0].version}`, href: `/manufacturer/share?v=${s.doc.versions[0].id}&to=${s.exporterId}` }
         : { label: "Open", href: docHref(s.doc) },
@@ -104,10 +111,11 @@ async function Overview() {
   if (untyped > 0 && can(account, "documents.edit")) {
     attention.push({
       key: "untyped",
-      badge: "Details",
       tone: "info",
-      title: `${untyped} document${untyped === 1 ? " has" : "s have"} no type or details yet`,
-      detail: "Add type, product and expiry date so expiry warnings and filters work",
+      kind: "info",
+      title: `${untyped} document${untyped === 1 ? "" : "s"} without details`,
+      badge: "Details missing",
+      detail: "Add type, product and expiry date so warnings and filters work",
       action: { label: "Review", href: "/manufacturer/documents" },
     });
   }
@@ -163,8 +171,8 @@ async function Overview() {
 
       <div className={`mt-5 grid grid-cols-1 gap-5 ${canActivity ? "xl:grid-cols-2" : ""}`}>
         <Panel title="Needs attention" aside={<span className="badge badge-contrast badge-sm">{attention.length} item{attention.length === 1 ? "" : "s"}</span>}>
-          <Attention items={attention.slice(0, 8)} empty="Nothing needs attention. Expiring documents, shares ending soon and exporters holding older versions show up here." />
-          {attention.length > 8 && <p className="px-5 pb-4 text-sm text-secondary">and {attention.length - 8} more</p>}
+          <Attention items={attention.slice(0, 6)} empty="Expiring documents, shares ending soon and exporters holding older versions will show up here." />
+          {attention.length > 6 && <p className="border-t border-contrast-10 px-5 py-3 text-sm text-secondary">and {attention.length - 6} more</p>}
         </Panel>
 
         {canActivity && (
@@ -172,31 +180,34 @@ async function Overview() {
             {events.length === 0 ? (
               <p className="px-5 py-8 text-center text-sm text-secondary">No exporter has viewed or downloaded a document yet.</p>
             ) : (
-              <ol className="px-5 py-2">
-                {events.slice(0, 7).map((e) => {
+              <>
+              <ActivityFeed
+                today={today}
+                items={events.slice(0, 6).map((e): ActivityItem => {
                   const info = versionInfo.get(e.version_id);
-                  const name = exporterName.get(e.exporter_org_id) ?? "Former exporter";
-                  return (
-                    <li key={e.id} className="flex gap-3 py-2.5">
-                      <span aria-hidden="true" className={`grid size-8 shrink-0 place-items-center rounded-full text-xs font-semibold ${toneFor(e.exporter_org_id)}`}>
-                        {initialsOf(name)}
-                      </span>
-                      <span className="min-w-0 flex-1 text-sm leading-snug">
-                        <span className="font-semibold text-header">{e.user_email ?? "An exporter user"}</span>{" "}
-                        <span className="text-secondary">({name})</span> {e.action === "download" ? "downloaded" : "viewed"}{" "}
-                        {info ? (
-                          <Link href={docHref(info.doc)} className="font-medium text-header hover:text-primary-text hover:underline">
-                            {info.doc.name} v{info.version}
-                          </Link>
-                        ) : (
-                          <span className="text-secondary">a deleted document</span>
-                        )}
-                        <span className="block text-xs text-secondary">{dateTime.format(new Date(e.created_at))}</span>
-                      </span>
-                    </li>
-                  );
+                  return {
+                    id: e.id,
+                    action: e.action,
+                    actor: e.user_email ?? "An exporter user",
+                    company: exporterName.get(e.exporter_org_id) ?? "Former exporter",
+                    companyId: e.exporter_org_id,
+                    target: info ? `${info.doc.name} v${info.version}` : "a deleted document",
+                    href: info ? docHref(info.doc) : undefined,
+                    at: e.created_at,
+                  };
                 })}
-              </ol>
+                avatar={(item) => (
+                  <span className={`grid size-9 place-items-center rounded-full text-xs font-semibold ${toneFor(item.companyId)}`} aria-hidden="true">
+                    {initialsOf(item.company)}
+                  </span>
+                )}
+              />
+              {events.length > 6 && can(account, "audit.view") && (
+                <Link href="/manufacturer/audit?category=access" className="block border-t border-contrast-10 px-5 py-3 text-sm font-medium text-primary-text hover:bg-contrast-5">
+                  See all views and downloads
+                </Link>
+              )}
+              </>
             )}
           </Panel>
         )}

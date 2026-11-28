@@ -78,10 +78,11 @@ async function Overview() {
         const days = certDays(d)!;
         return {
           key: `cert-${d.share_id}`,
-          badge: days < 0 ? "Expired" : `${days} day${days === 1 ? "" : "s"}`,
           tone: "error",
-          title: `${d.file_name} ${days < 0 ? "expired" : "expires"} ${formatDate(d.document_expiry)}`,
-          detail: `${d.manufacturer_name}${d.product ? ` · ${d.product}` : ""} · ask for the renewed document`,
+          kind: "expiry",
+          title: d.file_name,
+          badge: days < 0 ? "Expired" : days === 0 ? "Expires today" : `Expires in ${days} day${days === 1 ? "" : "s"}`,
+          detail: [formatDate(d.document_expiry), d.manufacturer_name, d.product].filter(Boolean).join(" · "),
           action: { label: "Open", href: `/exporter/shared/${d.manufacturer_id}` },
         };
       }),
@@ -91,19 +92,21 @@ async function Overview() {
         const days = Math.max(0, Math.ceil((Date.parse(d.expires_at!) - now) / DAY));
         return {
           key: `end-${d.share_id}`,
-          badge: `${days} day${days === 1 ? "" : "s"}`,
           tone: "warning",
-          title: `Your access to ${d.file_name} ends ${formatDate(d.expires_at)}`,
-          detail: `${d.manufacturer_name} · download what you need or ask for more time`,
+          kind: "clock",
+          title: d.file_name,
+          badge: days === 0 ? "Access ends today" : `Access ends in ${days} day${days === 1 ? "" : "s"}`,
+          detail: `${d.manufacturer_name} · v${d.version} · until ${formatDate(d.expires_at)}`,
           action: { label: "Open", href: `/exporter/shared/${d.manufacturer_id}` },
         };
       }),
     ...superseded.map((d): AttentionItem => ({
       key: `old-${d.share_id}`,
-      badge: "Superseded",
       tone: "contrast",
-      title: `${d.file_name}: you have v${d.version}, v${d.latest_version} exists`,
-      detail: `${d.manufacturer_name} · ask them to share the latest version`,
+      kind: "version",
+      title: d.file_name,
+      badge: `Superseded by v${d.latest_version}`,
+      detail: `You have v${d.version} · ${d.manufacturer_name}`,
       action: { label: "Open", href: `/exporter/shared/${d.manufacturer_id}` },
     })),
   ];
@@ -192,7 +195,7 @@ async function Overview() {
 
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
         <Panel title="Needs attention" aside={<span className="badge badge-contrast badge-sm">{attention.length} item{attention.length === 1 ? "" : "s"}</span>}>
-          <Attention items={attention.slice(0, 8)} empty="Nothing needs attention. Expiring certificates, access ending soon and superseded versions show up here." />
+          <Attention items={attention.slice(0, 6)} empty="Expiring certificates, access ending soon and superseded versions will show up here." />
         </Panel>
         <Panel title="Recently received" aside={<Link href="/exporter/shared" className="text-sm font-medium text-primary-text hover:underline">Shared with me</Link>}>
           {recent.length === 0 ? (
