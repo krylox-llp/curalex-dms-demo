@@ -1,0 +1,32 @@
+scripts/og-image.mjs
+  s_a50acd1b03b8a4::t_5707217b48d63c 1-55
+app/twitter-image.alt.txt
+  s_a50acd1b03b8a4::t_b78151ad9f8950 1
+app/opengraph-image.alt.txt
+  s_a50acd1b03b8a4::t_b78151ad9f8950 1
+components/landing/landing-page.tsx
+  s_a50acd1b03b8a4::t_1073d385adc2f9 17,30,282-307,309-310,312-317,322-324,326-341,343-348
+  s_a50acd1b03b8a4::t_e2f11251908a7a 308,311,318-321,325,342,350
+  s_a50acd1b03b8a4::t_b78151ad9f8950 49,425
+  s_a50acd1b03b8a4::t_1027bda7a7b004 50
+app/layout.tsx
+  s_a50acd1b03b8a4::t_b78151ad9f8950 18-19
+tests/e2e/browser.mjs
+  s_a50acd1b03b8a4::t_5707217b48d63c 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8b7709b8ac72fe1dd39e16fef3341294b82e7426",
+  "prompts": {},
+  "sessions": {
+    "s_a50acd1b03b8a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46bd6840-fcbf-46f0-86fd-9217f45fd74c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jagadeesh J <jagadeesh@krylox.ai>"
+    }
+  }
+}
