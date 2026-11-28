@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 export const STATE = fileURLToPath(new URL("./.state/", import.meta.url));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export async function withBrowser(baseUrl, fn) {
+export async function withBrowser(baseUrl, fn, { scale = 1, width = 1440, height = 900 } = {}) {
   fs.mkdirSync(STATE, { recursive: true });
   const port = 9300 + Math.floor(Math.random() * 500);
   const chrome = spawn(process.env.CHROME_BIN || "google-chrome",
@@ -25,12 +25,12 @@ export async function withBrowser(baseUrl, fn) {
     ws.onmessage = (e) => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); } else listeners.forEach((l) => l(m)); };
     const send = (method, params = {}) => new Promise((res, rej) => { const i = ++id; pending.set(i, (m) => (m.error ? rej(new Error(`${method}: ${m.error.message}`)) : res(m.result))); ws.send(JSON.stringify({ id: i, method, params })); });
     await send("Page.enable"); await send("Network.enable"); await send("Runtime.enable");
-    await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: false });
     const sessions = JSON.parse(fs.readFileSync(`${STATE}sessions.json`, "utf8"));
 
     const b = {
       sleep,
-      async as(who) { await send("Network.clearBrowserCookies"); if (who) for (const c of sessions[who].cookies) await send("Network.setCookie", { ...c, url: baseUrl }); },
+      async as(who) { await send("Network.clearBrowserCookies"); if (who && sessions[who]) for (const c of sessions[who].cookies) await send("Network.setCookie", { ...c, url: baseUrl }); },
       async go(path) {
         const loaded = new Promise((r) => listeners.push(function l(m) { if (m.method === "Page.loadEventFired") { listeners.splice(listeners.indexOf(l), 1); r(); } }));
         await send("Page.navigate", { url: baseUrl + path }); await loaded; await sleep(1200); return b.url();

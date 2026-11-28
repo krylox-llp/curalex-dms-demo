@@ -56,7 +56,7 @@ Browser ── page request ──▶ proxy.ts (refresh Supabase session, redire
 | `supabase/` | Local Supabase config and SQL migrations (schema, functions, policies) |
 | `tests/` | Database/permission suites and the headless-browser smoke test |
 | `docs/` | Project documentation (this file and others) |
-| `public/` | Static images (login page artwork) |
+| `public/` | Static images: login artwork, `landing/` screenshots |
 | `proxy.ts` | Next.js 16 "proxy" (formerly middleware) |
 
 ---
@@ -105,7 +105,8 @@ The client collects a reason (`components/reason-field.tsx`); the server action 
 |---|---|
 | `app/layout.tsx` | Root HTML layout, Inter font, global metadata |
 | `app/globals.css` | Tailwind import, **Lumo tokens** (colours, spacing, radii, shadows) mapped to Tailwind theme names, and component classes: buttons, text fields, checkbox, data grid, badges, document-type tag, tabs, overlay/menu, popover panel, dialog, notices, card |
-| `app/page.tsx` | `/`: redirects to the user's home (`/admin`, `/manufacturer`, `/exporter`) or `/login` |
+| `app/page.tsx` | `/`: public **landing page** for visitors (SEO metadata); signed-in users are redirected to their workspace |
+| `app/request-access/actions.ts` | Server action for the landing "Request access" form: server-side validation, honeypot, stores the request, emails the team |
 | `app/actions.ts` | Server actions `inviteCompany` (admin) and `inviteExporter` (manufacturer); send invitation emails |
 | `app/favicon.ico` | Icon |
 
@@ -150,6 +151,7 @@ The client collects a reason (`components/reason-field.tsx`); the server action 
 |---|---|
 | `app/admin/page.tsx` | `/admin`: invite companies, list companies with status |
 | `app/admin/audit/page.tsx` | Platform-wide audit trail and **integrity check** (`verify_audit_chain`) |
+| `app/admin/requests/page.tsx`, `actions.ts` | Access requests from the landing page, with status changes |
 | `app/team/actions.ts` | Team server actions (both company types): `inviteColleague` (sends email), `setMemberRoles`, `setMemberActive`, `cancelInvitation` |
 | `app/documents/[shareId]/[action]/route.ts` | Exporter view/download: access check, log, signed URL redirect |
 | `app/audit/export/route.ts` | CSV export of the audit trail with the current filters |
@@ -184,6 +186,9 @@ The client collects a reason (`components/reason-field.tsx`); the server action 
 | `google-sign-in-button.tsx` | Starts Google OAuth with `role` and `next` |
 | `login/login-layout.tsx` | Login page layout (artwork panel), `ErrorAlert`, `GoogleNotice` |
 | `login/role-login.tsx` | Manufacturer/exporter sign-in page body and error messages |
+| `landing/landing-page.tsx` | Landing page sections (hero, problems, how it works, exporters, security, FAQ, request access, footer) and the framed `Screenshot` component |
+| `landing/request-access-form.tsx` | The "Request access" form (works without JavaScript) |
+| `request-status.tsx` | Status picker on the admin Access requests page |
 
 ### Manufacturer (`components/manufacturer/`)
 
@@ -258,6 +263,7 @@ Everything about tables, functions, policies and triggers is in [`db-schema.md`]
 
 | Path | Purpose |
 |---|---|
+| `scripts/landing-screenshots.mjs` | Seeds fictional demo companies on an empty local database and captures the landing page screenshots into `public/landing/` |
 | `tests/README.md` | How to run and add tests |
 | `tests/db/lib.mjs` | Shared setup: reads the local Supabase URL/keys, refuses non-local URLs, service-role client for setup, random tag |
 | `tests/db/run.mjs` | Runs all suites (`pnpm test:db [filter]`), prints totals, sets the exit code |

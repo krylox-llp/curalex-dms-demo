@@ -6,18 +6,20 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Sidebar sections for the signed-in user's workspace, with counts. Cached per request. */
 export const getNavSections = cache(async (account: Account, area: "admin" | "company"): Promise<NavSection[]> => {
+  const supabase = await createClient();
   if (area === "admin" || !account.org) {
+    const { count } = await supabase.from("access_requests").select("id", { count: "exact", head: true }).eq("status", "new");
     return [
       {
         items: [
           { href: "/admin", label: "Companies", icon: "companies" },
+          { href: "/admin/requests", label: "Access requests", icon: "inbox", count: count ?? undefined },
           { href: "/admin/audit", label: "Audit trail", icon: "audit" },
         ],
       },
     ];
   }
 
-  const supabase = await createClient();
   const base = `/${account.org.type}`;
   const company: NavSection = {
     label: "Company",

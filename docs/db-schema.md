@@ -307,6 +307,23 @@ Written only by `record_document_access()`, which is called by the app server be
 | `share_id` | uuid | PK part, FK `document_shares`, cascade | Documents are attached **by reference to the share**, not copied; if the share is revoked the product shows it as "no longer available" |
 | `added_at` | timestamptz | NN | |
 
+### 4.16 `access_requests`: landing page "Request access" form
+
+| Column | Type | Rules | Meaning |
+|---|---|---|---|
+| `id` | uuid | PK | |
+| `name` | text | NN, trimmed 1–100 | |
+| `email` | text | NN, lower-cased, ≤ 254 | |
+| `company` | text | NN, trimmed 1–200 | |
+| `company_type` | text | `manufacturer` / `exporter` / `other` | |
+| `phone` | text | ≤ 30 | Optional |
+| `message` | text | ≤ 2000 | Optional |
+| `status` | text | `new` / `contacted` / `invited` / `declined`, default `new` | Follow-up by platform admins |
+| `handled_by`, `handled_at` | uuid, timestamptz | | Last status change |
+| `created_at` | timestamptz | NN | |
+
+Written only by `submit_access_request()` (callable signed out; validates; throttles 3 per email per day and 100 per hour overall, error `too_many_requests`). Readable only by platform admins; status changed with `set_access_request_status()`. Not audited (no regulated records).
+
 ### 4.15 `audit_log`
 
 | Column | Type | Meaning |
@@ -539,6 +556,7 @@ Things to keep exactly: case-insensitive unique names with tombstones, version n
 | 8 | `20261127080000_audit_trail.sql` | audit_log, triggers, hash chain, reasons, `verify_audit_chain` |
 | 9 | `20261127090000_roles.sql` | member_roles, deactivation, invitation roles, permissions in every write function, team functions |
 | 10 | `20261128000000_document_details.sql` | document details columns, `set_document_details`, details in `my_shared_documents` |
+| 11 | `20261128010000_access_requests.sql` | `access_requests` (landing page form), `submit_access_request`, `set_access_request_status` |
 
 (`070_rename` exists only in a git stash.)
 

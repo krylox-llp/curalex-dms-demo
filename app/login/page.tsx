@@ -53,7 +53,11 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
           </Link>
         ))}
       </div>
-      <div className="mt-8 text-center">
+      <p className="mt-6 text-center text-sm text-slate-500">
+        Not on CuraLex yet?{" "}
+        <Link href="/#request-access" className="font-medium text-blue-700 hover:underline">Request access</Link>
+      </p>
+      <div className="mt-6 text-center">
         <GoogleSignInButton variant="link" label="CuraLex team sign in" />
       </div>
     </LoginLayout>

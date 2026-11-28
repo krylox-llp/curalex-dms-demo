@@ -683,6 +683,58 @@ h3 {
     color: var(--lumo-warning-text-color);
   }
 
+  /* ---------------------------------------------------------- Landing form
+     Bordered fields (clear contrast for first-time visitors), 48px targets, 16px+ text so iOS
+     doesn't zoom, and error styling only after interaction (:user-invalid) or a server error. */
+  .landing-input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--lumo-contrast-40pct);
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-base-color);
+    color: var(--lumo-header-text-color);
+    font: inherit;
+    font-size: max(1rem, 1em);
+    line-height: 1.5;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .landing-input:hover {
+    border-color: var(--lumo-contrast-60pct);
+  }
+  .landing-input:focus-visible {
+    outline: none;
+    border-color: var(--lumo-primary-color);
+    box-shadow: 0 0 0 3px var(--lumo-primary-color-50pct);
+  }
+  .landing-input::placeholder {
+    color: var(--lumo-secondary-text-color);
+  }
+  .landing-input:user-invalid,
+  .landing-input[aria-invalid="true"] {
+    border-color: var(--lumo-error-color);
+  }
+  .landing-choice {
+    display: flex;
+    gap: 0.625rem;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--lumo-contrast-30pct);
+    border-radius: var(--lumo-border-radius-m);
+    background: var(--lumo-base-color);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .landing-choice:hover {
+    border-color: var(--lumo-contrast-50pct);
+  }
+  .landing-choice:has(input:checked) {
+    border-color: var(--lumo-primary-color);
+    background: var(--lumo-primary-color-10pct);
+  }
+  .landing-choice:has(input:focus-visible) {
+    box-shadow: 0 0 0 3px var(--lumo-primary-color-50pct);
+  }
+
   /* ------------------------------------------------------------------ Card */
   .card {
     border-radius: var(--lumo-border-radius-l);

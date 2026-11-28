@@ -47,7 +47,7 @@ export function Panel({
   return (
     <section className={`card overflow-hidden ${className}`} aria-label={title}>
       <div className="flex items-center justify-between gap-3 border-b border-contrast-10 px-5 py-3.5">
-        <h2 className="text-base font-semibold text-header">{title}</h2>
+        <h2 className="text-[1rem] font-semibold text-header">{title}</h2>
         {aside}
       </div>
       {children}

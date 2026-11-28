@@ -15,7 +15,7 @@ export function SelectionBar() {
   if (count === 0 || (!canShare && !canDelete)) return null;
   return (
     <div className="fixed inset-x-0 bottom-6 z-30 flex justify-center px-4">
-      <div className="flex items-center gap-3 rounded-lumo-l bg-contrast py-2 pl-5 pr-2 text-base text-white shadow-lumo-xl">
+      <div className="flex items-center gap-3 rounded-lumo-l bg-contrast py-2 pl-5 pr-2 text-[1rem] text-white shadow-lumo-xl">
         <span>
           <strong>{count}</strong> file{count === 1 ? "" : "s"} selected
           <span className="text-white/60"> · across folders</span>

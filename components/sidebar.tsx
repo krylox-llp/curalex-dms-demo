@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
-export type NavIcon = "overview" | "documents" | "shared" | "products" | "audit" | "team" | "companies" | "folder";
+export type NavIcon = "overview" | "documents" | "shared" | "products" | "audit" | "team" | "companies" | "folder" | "inbox";
 
 export type NavItem = {
   href: string;
@@ -117,6 +117,7 @@ const PATHS: Record<NavIcon, string> = {
   team: "M16 19v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1M9.5 10a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM21 19v-1a4 4 0 00-3-3.87M16 3.13a3.5 3.5 0 010 6.75",
   companies: "M4 20V6a1 1 0 011-1h8a1 1 0 011 1v14M14 10h5a1 1 0 011 1v9M3 20h18M8 9h2M8 13h2M8 17h2",
   folder: "M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z",
+  inbox: "M3 13h5l1.5 3h5L16 13h5M5 5h14l2 8v5a1 1 0 01-1 1H4a1 1 0 01-1-1v-5z",
 };
 
 function Icon({ name }: { name: NavIcon }) {

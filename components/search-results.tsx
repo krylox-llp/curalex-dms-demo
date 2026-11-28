@@ -22,7 +22,7 @@ export function SearchResults({ query, groups }: { query: string; groups: Search
       <div className="flex flex-col gap-5">
         {groups.filter((g) => g.items.length).map((g) => (
           <section key={g.title} className="card overflow-hidden" aria-label={g.title}>
-            <h2 className="border-b border-contrast-10 px-5 py-3 text-base font-semibold text-header">
+            <h2 className="border-b border-contrast-10 px-5 py-3 text-[1rem] font-semibold text-header">
               {g.title} <span className="font-normal text-secondary">({g.items.length})</span>
             </h2>
             <ul>

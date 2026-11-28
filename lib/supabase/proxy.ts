@@ -33,7 +33,8 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const signedIn = Boolean(data?.claims);
   const { pathname, searchParams } = request.nextUrl;
-  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  // "/" is the public landing page (signed-in users are sent to their workspace by the page).
+  const isPublic = pathname === "/" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
   const redirect = (path: string) => {
     const url = request.nextUrl.clone();
@@ -50,7 +51,7 @@ export async function updateSession(request: NextRequest) {
     // Workspace links go to that role's sign-in page; everything else to the chooser.
     const area = pathname.split("/")[1];
     const loginPage = area === "manufacturer" || area === "exporter" ? `/login/${area}` : "/login";
-    return redirect(pathname === "/" ? loginPage : `${loginPage}?next=${encodeURIComponent(pathname)}`);
+    return redirect(`${loginPage}?next=${encodeURIComponent(pathname)}`);
   }
 
   // Signed-in users skip the login page ("/" sends them to their workspace),

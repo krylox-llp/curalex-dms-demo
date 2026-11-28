@@ -1,7 +1,7 @@
 # How CuraLex - DMS works
 
 **Audience:** product owners, developers, QA and anyone onboarding to the project
-**Describes:** the code at 2026-11-28 (migrations up to `20261128000000_document_details.sql`)
+**Describes:** the code at 2026-11-28 (migrations up to `20261128010000_access_requests.sql`)
 **Related:** [`db-schema.md`](./db-schema.md) (full data model), [`compliance-gap-assessment.md`](./compliance-gap-assessment.md)
 
 ---
@@ -78,6 +78,10 @@ Roles follow Revised Schedule M (see [`roles-and-permissions.md`](./roles-and-pe
 - Role changes, additions and deactivations are recorded in the audit trail.
 
 ---
+
+## 2.2 Public landing page
+
+Signed-out visitors to `/` (e.g. `dms.krylox.ai`) see the **landing page**: what CuraLex does, "How it works" with real screenshots (`public/landing/`, regenerated with `scripts/landing-screenshots.mjs`), sections for exporters and security, FAQ and a **Request access** form. Submissions are stored (`access_requests`), emailed to `ACCESS_REQUEST_NOTIFY_EMAIL` (default hello@krylox.ai) and listed for platform admins at **Admin → Access requests**, where they set the status (New, Contacted, Invited, Declined). Signed-in users opening `/` go straight to their workspace.
 
 ## 3. Signing in and invitations
 
@@ -531,6 +535,7 @@ Run the migrations in `supabase/migrations/` **in order** on the Supabase projec
 8. `20261127080000_audit_trail.sql`
 9. `20261127090000_roles.sql` (existing users keep full access through founder roles)
 10. `20261128000000_document_details.sql` (document details; without it the Documents and Overview pages show an "out of date" error)
+11. `20261128010000_access_requests.sql` (landing page "Request access" form)
 
 Then add yourself as admin:
 
