@@ -15,6 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Absolute URLs for link previews (opengraph-image.jpg / twitter-image.jpg in this folder).
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://dms.krylox.ai"),
   title: "CuraLex - DMS",
   description: "Document sharing for pharma manufacturers and exporters",
 };

@@ -14,6 +14,7 @@ export function LandingPage() {
         <HowItWorks />
         <ForExporters />
         <Security />
+        <Pricing />
         <Faq />
         <RequestAccess />
       </main>
@@ -26,6 +27,7 @@ const NAV = [
   { href: "#how-it-works", label: "How it works" },
   { href: "#exporters", label: "For exporters" },
   { href: "#security", label: "Security" },
+  { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -44,7 +46,8 @@ function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <a href="#request-access" className="btn-primary">Request access</a>
+          <Link href="/login" className="btn-tertiary">Sign in</Link>
+          <a href="#request-access" className="btn-primary hidden sm:inline-flex">Request access</a>
         </div>
       </div>
     </header>
@@ -276,7 +279,75 @@ function Security() {
   );
 }
 
+const INCLUDED = [
+  {
+    group: "Documents",
+    items: ["Folders, versions and full version history", "Document type, product, market and expiry dates", "Filters, search and a details panel for every file", "Files up to 50 MB each"],
+  },
+  {
+    group: "Sharing",
+    items: ["Share the exact version with any of your exporters", "Access for 7 days to a year, or no end date", "Extend or revoke any time, with reasons recorded", "Invite exporters by email"],
+  },
+  {
+    group: "Visibility",
+    items: ["Every exporter view and download logged", "Overview with expiring certificates and access ending", "Exporter portal organised by product", "Superseded versions flagged to exporters"],
+  },
+  {
+    group: "Control and compliance",
+    items: ["Roles based on Revised Schedule M", "Team management and user deactivation", "Tamper-evident audit trail with CSV export", "Invite-only Google sign-in, private storage"],
+  },
+];
+
+function Pricing() {
+  return (
+    <section id="pricing" aria-labelledby="pricing-title" className="scroll-mt-20 border-t border-contrast-10">
+      <div className="mx-auto max-w-7xl px-5 py-20 md:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-primary-text">Pricing</p>
+          <h2 id="pricing-title" className="mt-3 text-3xl font-bold tracking-tight text-header md:text-4xl">
+            Enterprise-grade document control, without the enterprise price
+          </h2>
+          <p className="mt-4 text-[1.0625rem] leading-relaxed text-secondary">
+            Built for MSME manufacturers and exporters. Every feature on this page is included, with no modules to unlock.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-2xl bg-base shadow-[0_0_0_1px_var(--lumo-contrast-10pct),0_24px_60px_-24px_hsla(214,60%,25%,0.3)]">
+          <div className="flex flex-col gap-6 bg-gradient-to-br from-primary to-[hsl(214,100%,40%)] px-8 py-9 text-white md:flex-row md:items-center md:justify-between md:px-10">
+            <div>
+              <p className="text-lg font-medium text-white/75 line-through decoration-white/50">Not lakhs a year.</p>
+              <p className="mt-1 text-4xl font-bold tracking-tight sm:text-5xl">A few thousand a month.</p>
+              <p className="mt-3 max-w-xl text-[0.9375rem] text-white/85">
+                Everything below is included: documents, sharing, exporter visibility, roles and the audit trail.
+              </p>
+            </div>
+            <a href="#request-access" className="inline-flex h-12 shrink-0 items-center justify-center rounded-lumo-m bg-white px-6 text-[1rem] font-semibold text-primary-text transition hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+              Get your price
+            </a>
+          </div>
+          <div className="grid gap-x-10 gap-y-8 px-8 py-9 sm:grid-cols-2 md:px-10 lg:grid-cols-4">
+            {INCLUDED.map((g) => (
+              <div key={g.group}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-header">{g.group}</h3>
+                <ul className="mt-4 flex flex-col gap-3">
+                  {g.items.map((i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-[0.9375rem] leading-snug text-body"><Check className="mt-0.5" /> {i}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="mt-6 text-center text-sm text-secondary">
+          Tell us about your company in the form below and we&apos;ll send your price. Or write to <a href="mailto:hello@krylox.ai" className="font-medium text-primary-text hover:underline">hello@krylox.ai</a>.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 const FAQ = [
+  { q: "How much does it cost?", a: "A few thousand rupees a month, not the lakhs a year that enterprise document systems cost, with every feature included: documents and versions, sharing, exporter activity, expiry warnings, roles and the audit trail. Request access and we'll send the price for your company." },
   { q: "Who is CuraLex - DMS for?", a: "Pharmaceutical manufacturers, especially MSMEs, who supply merchant exporters, and the exporters who need those manufacturers' documents for registrations and renewals in their target markets." },
   { q: "How do exporters join?", a: "A manufacturer invites them by email from CuraLex. The exporter signs in with that Google account and immediately sees what has been shared with them." },
   { q: "Which documents can I manage?", a: "Any file up to 50 MB: certificates of analysis, CoPPs, GMP and ISO certificates, manufacturing licences, DMFs, stability data, specifications, SOPs and more." },
@@ -351,6 +422,7 @@ function SiteFooter() {
         <p>© Krylox. CuraLex - DMS.</p>
         <div className="flex gap-5">
           <a href="mailto:hello@krylox.ai" className="hover:text-header">hello@krylox.ai</a>
+          <Link href="/login" className="hover:text-header">Sign in</Link>
         </div>
       </div>
     </footer>

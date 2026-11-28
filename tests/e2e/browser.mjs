@@ -26,7 +26,7 @@ export async function withBrowser(baseUrl, fn, { scale = 1, width = 1440, height
     const send = (method, params = {}) => new Promise((res, rej) => { const i = ++id; pending.set(i, (m) => (m.error ? rej(new Error(`${method}: ${m.error.message}`)) : res(m.result))); ws.send(JSON.stringify({ id: i, method, params })); });
     await send("Page.enable"); await send("Network.enable"); await send("Runtime.enable");
     await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: false });
-    const sessions = JSON.parse(fs.readFileSync(`${STATE}sessions.json`, "utf8"));
+    const sessions = fs.existsSync(`${STATE}sessions.json`) ? JSON.parse(fs.readFileSync(`${STATE}sessions.json`, "utf8")) : {};
 
     const b = {
       sleep,
